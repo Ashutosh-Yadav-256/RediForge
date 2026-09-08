@@ -1,10 +1,10 @@
-# RedisGen
+# RediForge
 
 A fully functional, zero-dependency, Redis-compatible in-memory data store built from scratch in Node.js.
 
 ## Overview
 
-RedisGen implements the RESP2 protocol and supports over 90+ standard Redis commands across all major data structures (Strings, Lists, Hashes, Sets, Sorted Sets). It can be used as a drop-in replacement for basic Redis caching and pub/sub needs.
+RediForge implements the RESP2 protocol and supports over 90+ standard Redis commands across all major data structures (Strings, Lists, Hashes, Sets, Sorted Sets). It can be used as a drop-in replacement for basic Redis caching and pub/sub needs.
 
 ## Features
 
