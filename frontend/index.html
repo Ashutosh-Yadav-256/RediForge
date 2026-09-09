@@ -22,7 +22,7 @@
         }
     </script>
 </head>
-<body class="antialiased min-h-screen overflow-x-hidden flex flex-col redisgen-container">
+<body class="antialiased min-h-screen overflow-x-hidden flex flex-col rediforge-container">
 
     <!-- TopNavBar Component -->
     <header class="fixed top-0 left-0 w-full z-40 flex justify-between items-center px-8 py-4 bg-[#E8EBF2] shadow-[0_4px_10px_rgba(196,201,212,0.5)] border-b border-white/50" id="tour-header">
@@ -80,12 +80,12 @@
                     <span class="text-sm font-semibold text-[#7E8490] uppercase tracking-wider">Memory Usage</span>
                     <div class="skill-indicator indicator-blue"></div>
                 </div>
-                <div id="stat-memory" class="text-3xl font-bold text-[#2A2F33]">1.2GB</div>
+                <div id="stat-memory" class="text-3xl font-bold text-[#2A2F33]">--</div>
                 <div class="flex items-center gap-2 mt-auto">
                     <div class="flex-grow h-2 neo-inset rounded-full overflow-hidden p-[1px]">
-                        <div class="h-full bg-accent-blue w-[30%] rounded-full shadow-[0_0_5px_rgba(24,133,226,0.5)]"></div>
+                        <div id="stat-mem-bar" class="h-full bg-accent-blue w-[0%] rounded-full shadow-[0_0_5px_rgba(24,133,226,0.5)] transition-all duration-500"></div>
                     </div>
-                    <span class="text-xs font-bold text-[#7E8490]">/ 4GB</span>
+                    <span id="stat-mem-total" class="text-xs font-bold text-[#7E8490]">RSS</span>
                 </div>
             </div>
 
@@ -94,7 +94,7 @@
                     <span class="text-sm font-semibold text-[#7E8490] uppercase tracking-wider">Connected Clients</span>
                     <div class="skill-indicator indicator-green"></div>
                 </div>
-                <div id="stat-clients" class="text-3xl font-bold text-[#2A2F33]">124</div>
+                <div id="stat-clients" class="text-3xl font-bold text-[#2A2F33]">0</div>
                 <div class="text-sm font-semibold text-accent-green mt-auto flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-accent-green animate-pulse"></span>
                     Live Connections
@@ -106,9 +106,9 @@
                     <span class="text-sm font-semibold text-[#7E8490] uppercase tracking-wider">Total Keys</span>
                     <div class="skill-indicator" style="background-color: #F5A623;"></div>
                 </div>
-                <div id="stat-keys" class="text-3xl font-bold text-[#2A2F33]">45.2k</div>
-                <div class="text-sm font-semibold text-[#7E8490] mt-auto">
-                    +1.2k since yesterday
+                <div id="stat-keys" class="text-3xl font-bold text-[#2A2F33]">0</div>
+                <div id="stat-keys-sub" class="text-sm font-semibold text-[#7E8490] mt-auto">
+                    in current database
                 </div>
             </div>
 
@@ -117,9 +117,9 @@
                     <span class="text-sm font-semibold text-[#7E8490] uppercase tracking-wider">Node Status</span>
                     <div class="skill-indicator indicator-red"></div>
                 </div>
-                <div id="stat-node" class="text-2xl font-bold text-[#2A2F33]">Master-01</div>
+                <div id="stat-node" class="text-2xl font-bold text-[#2A2F33]">RediForge</div>
                 <div class="text-xs font-mono font-bold text-[#7E8490] mt-auto neo-inset px-2 py-1 rounded inline-block w-max">
-                    Uptime: <span id="stats-uptime">42d 18h</span>
+                    Uptime: <span id="stats-uptime">0s</span>
                 </div>
             </div>
         </section>
@@ -137,23 +137,50 @@
                             <span class="material-symbols-outlined text-accent-blue">show_chart</span>
                             Memory History
                         </h2>
-                        <div class="flex gap-2">
-                            <button class="neo-button px-3 py-1 text-xs">1H</button>
-                            <button class="neo-button neo-button-pressed text-accent-blue px-3 py-1 text-xs">24H</button>
-                            <button class="neo-button px-3 py-1 text-xs">7D</button>
+                        <div class="flex items-center gap-4">
+                            <div class="hidden sm:flex items-center gap-3 text-xs font-mono">
+                                <span class="flex items-center gap-1.5 text-accent-blue font-semibold">
+                                    <span class="w-2 h-2 rounded-full bg-accent-blue animate-pulse"></span>
+                                    Current: <strong id="chart-current-mem" class="font-bold">--</strong>
+                                </span>
+                                <span class="text-[#7E8490]">Peak: <strong id="chart-peak-mem" class="font-bold">--</strong></span>
+                            </div>
+                            <span class="neo-button neo-button-pressed text-accent-blue px-3 py-1 text-xs font-semibold">Live (1s)</span>
                         </div>
                     </div>
                     
-                    <div class="relative flex-grow mt-4 p-4 z-0">
-                        <canvas id="memory-chart" class="absolute inset-4"></canvas>
-                        <!-- SVG Fallback -->
-                        <svg style="display:none;" class="absolute inset-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)]" preserveAspectRatio="none" viewBox="0 0 100 100">
-                            <line stroke="rgba(0,0,0,0.05)" stroke-width="0.5" x1="0" x2="100" y1="25" y2="25"></line>
-                            <line stroke="rgba(0,0,0,0.05)" stroke-width="0.5" x1="0" x2="100" y1="50" y2="50"></line>
-                            <line stroke="rgba(0,0,0,0.05)" stroke-width="0.5" x1="0" x2="100" y1="75" y2="75"></line>
-                            <path d="M0,80 Q10,75 20,60 T40,50 T60,65 T80,30 T100,25" fill="none" stroke="#1885E2" stroke-width="1.5"></path>
-                            <circle cx="100" cy="25" fill="#1885E2" r="2"></circle>
-                        </svg>
+                    <div class="relative flex-grow p-4 pt-1 z-0 flex flex-col justify-between" id="chart-container">
+                        <div class="relative w-full flex-grow min-h-[160px] neo-inset p-3 rounded-xl overflow-hidden flex flex-col justify-between">
+                            <!-- Subtle Grid & Scale Labels -->
+                            <div class="absolute inset-0 p-3 pointer-events-none flex flex-col justify-between text-[10px] font-mono text-[#7E8490]/70 z-0 select-none">
+                                <div class="flex justify-between border-b border-[#C4C9D4]/20 pb-0.5"><span id="scale-max">--</span><span>Peak</span></div>
+                                <div class="flex justify-between border-b border-[#C4C9D4]/20 pb-0.5"><span id="scale-mid">--</span><span>50%</span></div>
+                                <div class="flex justify-between"><span id="scale-min">0 B</span><span>0%</span></div>
+                            </div>
+
+                            <!-- SVG Realtime Area & Line Chart -->
+                            <svg id="memory-svg-chart" class="w-full h-full relative z-10 overflow-visible" viewBox="0 0 500 140" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="memGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#1885E2" stop-opacity="0.35"></stop>
+                                        <stop offset="100%" stop-color="#1885E2" stop-opacity="0.0"></stop>
+                                    </linearGradient>
+                                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#1885E2" flood-opacity="0.35"/>
+                                    </filter>
+                                </defs>
+                                <path id="mem-area-path" d="" fill="url(#memGradient)"></path>
+                                <path id="mem-line-path" d="" fill="none" stroke="#1885E2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"></path>
+                                <circle id="mem-latest-point" cx="-10" cy="-10" r="4" fill="#1885E2" stroke="#FFFFFF" stroke-width="2"></circle>
+                            </svg>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px] font-mono text-[#7E8490] mt-2 px-1">
+                            <span>T-60s</span>
+                            <span class="text-accent-blue font-medium flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">sensors</span> Real-time telemetry
+                            </span>
+                            <span>Now</span>
+                        </div>
                     </div>
                 </div>
 
@@ -165,25 +192,17 @@
                             <div class="w-3 h-3 rounded-full bg-[#F5A623]"></div>
                             <div class="w-3 h-3 rounded-full bg-accent-green"></div>
                         </div>
-                        <span class="font-mono text-xs font-bold text-[#7E8490] tracking-wider">REDIS CLI - Local:6379</span>
+                        <span id="cli-server-label" class="font-mono text-xs font-bold text-[#7E8490] tracking-wider">REDIS CLI - Connected</span>
                         <button id="btn-clear-terminal" class="text-xs font-bold text-accent-blue hover:text-[#2A2F33] transition-colors">Clear</button>
                     </div>
                     
                     <div class="neo-inset flex-grow m-2 p-3 overflow-y-auto font-mono text-sm flex flex-col gap-1 bg-white/50" id="terminal-output">
-                        <div class="text-[#7E8490]">redis-cli 7.0.12</div>
-                        <div class="text-[#7E8490]">Connected to 127.0.0.1:6379</div>
-                        <div><span class="text-accent-blue font-bold">127.0.0.1:6379></span> PING</div>
-                        <div class="text-accent-green font-bold">PONG</div>
-                        <div><span class="text-accent-blue font-bold">127.0.0.1:6379></span> INFO MEMORY</div>
-                        <div class="text-[#7E8490] opacity-80 leading-snug">
-                            # Memory<br/>
-                            used_memory:1245678<br/>
-                            used_memory_human:1.19G
-                        </div>
+                        <div class="text-[#7E8490]">RediForge Web CLI v1.0.0</div>
+                        <div class="text-[#7E8490]">Type any Redis command (e.g. PING, SET key value, GET key, KEYS *)...</div>
                     </div>
                     
                     <div class="px-4 pb-3 flex items-center gap-2 font-mono">
-                        <span class="text-accent-blue font-bold">redis-gen></span>
+                        <span id="terminal-prompt" class="text-accent-blue font-bold">rediforge></span>
                         <input type="text" id="terminal-input" class="neo-inset px-2 py-1 flex-grow font-mono text-sm" placeholder="Type a command (e.g. GET key)..." spellcheck="false" autocomplete="off"/>
                     </div>
                 </div>
@@ -196,33 +215,39 @@
                         <span class="material-symbols-outlined text-accent-blue">manage_search</span>
                         Key Browser
                     </h2>
-                    <button id="btn-refresh-keys" class="neo-button p-1 text-accent-blue flex items-center justify-center">
-                        <span class="material-symbols-outlined text-sm">refresh</span>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-add-key" class="neo-button px-2.5 py-1 text-xs text-accent-blue flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[16px]">add</span> New
+                        </button>
+                        <button id="btn-refresh-keys" title="Refresh Keys" class="neo-button p-1 text-accent-blue flex items-center justify-center">
+                            <span class="material-symbols-outlined text-sm">refresh</span>
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="p-4">
+                <div class="p-4 pb-2">
                     <div class="relative">
                         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#7E8490] text-[18px]">search</span>
                         <input id="key-filter" type="text" class="neo-inset w-full py-2 pl-10 pr-4 font-mono text-sm placeholder:text-[#7E8490]" placeholder="Search keys..."/>
                     </div>
                 </div>
                 
-                <div class="flex-grow overflow-y-auto px-2">
-                    <div id="key-list" class="flex flex-col gap-2 w-full"></div>
+                <div class="flex-grow overflow-y-auto p-3">
+                    <div id="key-list" class="flex flex-col w-full"></div>
                 </div>
                 
                 <!-- Detail Panel (Value Viewer) -->
                 <div id="key-detail" class="h-[250px] neo-inset m-2 p-4 flex flex-col hidden bg-white/50 border border-white/50">
                     <div class="flex justify-between items-center mb-2">
                         <div class="flex items-center gap-2">
-                            <span id="detail-key-name" class="font-mono font-bold text-accent-blue text-sm truncate max-w-[150px]"></span>
-                            <span id="detail-key-type" class="neo-badge text-[10px]"></span>
+                            <span id="detail-key-name" class="font-mono font-bold text-accent-blue text-sm truncate max-w-[140px]"></span>
+                            <span id="detail-key-type" class="detail-type-badge key-type-string"></span>
+                            <span id="detail-key-ttl" class="text-[10px] font-mono text-[#7E8490]"></span>
                         </div>
-                        <div class="flex gap-2">
-                            <button class="text-[#7E8490] hover:text-accent-blue transition-colors"><span class="material-symbols-outlined text-[16px]">edit</span></button>
-                            <button class="text-[#7E8490] hover:text-accent-red transition-colors"><span class="material-symbols-outlined text-[16px]">delete</span></button>
-                            <button id="btn-close-detail" class="text-[#7E8490] hover:text-[#2A2F33] transition-colors ml-1"><span class="material-symbols-outlined text-[18px]">close</span></button>
+                        <div class="flex gap-1 items-center">
+                            <button id="btn-edit-key" title="Edit Value" class="neo-button p-1 text-[#7E8490] hover:text-accent-blue transition-colors"><span class="material-symbols-outlined text-[16px]">edit</span></button>
+                            <button id="btn-delete-key" title="Delete Key" class="neo-button p-1 text-[#7E8490] hover:text-accent-red transition-colors"><span class="material-symbols-outlined text-[16px]">delete</span></button>
+                            <button id="btn-close-detail" title="Close" class="neo-button p-1 text-[#7E8490] hover:text-[#2A2F33] transition-colors ml-1"><span class="material-symbols-outlined text-[18px]">close</span></button>
                         </div>
                     </div>
                     <div id="detail-content" class="bg-white/70 rounded p-2 flex-grow overflow-y-auto font-mono text-xs leading-relaxed whitespace-pre text-[#2A2F33] shadow-inner border border-[#C4C9D4]/30"></div>
@@ -236,9 +261,98 @@
         <div class="neo-card p-8 flex flex-col items-center max-w-sm w-full">
             <span class="material-symbols-outlined text-accent-blue text-6xl mb-4">database</span>
             <h1 class="text-3xl font-bold text-[#2A2F33] mb-6">RediForge</h1>
-            <input type="text" id="ws-url" value="wss://redisgen.onrender.com" class="neo-inset w-full p-3 mb-4 text-center font-mono text-[#2A2F33]" placeholder="Server URL">
-            <button id="btn-connect" class="neo-button neo-button-primary w-full p-3 text-lg">Connect</button>
-            <p id="login-error" class="text-accent-red mt-4 text-sm font-bold h-5"></p>
+            <input type="text" id="ws-url" value="wss://rediforge.onrender.com" class="neo-inset w-full p-3 mb-3 text-center font-mono text-[#2A2F33]" placeholder="Server URL">
+            <input type="password" id="ws-auth" class="neo-inset w-full p-3 mb-4 text-center font-mono text-[#2A2F33]" placeholder="Password / Auth Token (optional)">
+            <button id="btn-connect" class="neo-button neo-button-primary w-full p-3 text-lg font-bold">Connect</button>
+            <p id="login-error" class="text-accent-red mt-4 text-sm font-bold text-center min-h-[1.25rem]"></p>
+        </div>
+    </div>
+
+    <!-- Add Key Modal -->
+    <div id="modal-add-key" class="hidden neo-modal-backdrop">
+        <div class="neo-modal p-6 flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <h3 class="text-lg font-bold text-[#2A2F33] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-blue">add_circle</span> Add New Key
+                </h3>
+                <button id="btn-close-add-modal" class="text-[#7E8490] hover:text-accent-red transition-colors"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="flex flex-col gap-3">
+                <div>
+                    <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Key Name</label>
+                    <input type="text" id="new-key-name" class="neo-inset w-full p-2 font-mono text-sm" placeholder="e.g. user:1001" autocomplete="off"/>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Data Type</label>
+                        <select id="new-key-type" class="neo-inset w-full p-2 font-mono text-sm bg-transparent">
+                            <option value="string">String</option>
+                            <option value="hash">Hash</option>
+                            <option value="list">List</option>
+                            <option value="set">Set</option>
+                            <option value="zset">Sorted Set</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">TTL (Sec, optional)</label>
+                        <input type="number" id="new-key-ttl" class="neo-inset w-full p-2 font-mono text-sm" placeholder="No expiry"/>
+                    </div>
+                </div>
+                <div>
+                    <label id="new-key-val-label" class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Value</label>
+                    <textarea id="new-key-value" class="neo-inset w-full p-2 font-mono text-sm h-24" placeholder="Enter string value..."></textarea>
+                    <p id="new-key-hint" class="text-[11px] text-[#7E8490] mt-1">For string values, enter raw text.</p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-[#C4C9D4]/30">
+                <button id="btn-cancel-add-key" class="neo-button px-4 py-2 text-sm text-[#7E8490]">Cancel</button>
+                <button id="btn-save-add-key" class="neo-button neo-button-primary px-4 py-2 text-sm">Create Key</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Key Modal -->
+    <div id="modal-edit-key" class="hidden neo-modal-backdrop">
+        <div class="neo-modal p-6 flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <h3 class="text-lg font-bold text-[#2A2F33] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-blue">edit_note</span> Edit Key Value
+                </h3>
+                <button id="btn-close-edit-modal" class="text-[#7E8490] hover:text-accent-red transition-colors"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="flex flex-col gap-3">
+                <div>
+                    <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Key Name</label>
+                    <input type="text" id="edit-key-name" class="neo-inset w-full p-2 font-mono text-sm bg-gray-100 opacity-80" readonly/>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Value</label>
+                    <textarea id="edit-key-value" class="neo-inset w-full p-2 font-mono text-sm h-32" placeholder="Value..."></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-[#C4C9D4]/30">
+                <button id="btn-cancel-edit-key" class="neo-button px-4 py-2 text-sm text-[#7E8490]">Cancel</button>
+                <button id="btn-save-edit-key" class="neo-button neo-button-primary px-4 py-2 text-sm">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dangerous Command Confirmation Modal -->
+    <div id="modal-confirm-danger" class="hidden neo-modal-backdrop">
+        <div class="neo-modal p-6 flex flex-col gap-4 border-l-4 border-accent-red">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <h3 class="text-lg font-bold text-accent-red flex items-center gap-2">
+                    <span class="material-symbols-outlined">warning</span> Dangerous Action Warning
+                </h3>
+                <button id="btn-close-danger-modal" class="text-[#7E8490] hover:text-accent-red transition-colors"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <p id="danger-modal-msg" class="text-sm text-[#2A2F33] leading-relaxed">
+                You are about to execute a destructive command. This action cannot be undone. Are you sure you want to proceed?
+            </p>
+            <div class="flex justify-end gap-2 pt-2 border-t border-[#C4C9D4]/30">
+                <button id="btn-cancel-danger" class="neo-button px-4 py-2 text-sm text-[#7E8490]">Cancel</button>
+                <button id="btn-proceed-danger" class="neo-button neo-button-danger px-4 py-2 text-sm">Proceed & Execute</button>
+            </div>
         </div>
     </div>
 
@@ -269,6 +383,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=5"></script>
+    <script src="app.js?v=6"></script>
 </body>
 </html>

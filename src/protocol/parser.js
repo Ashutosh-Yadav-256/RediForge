@@ -3,6 +3,7 @@
 const CRLF = '\r\n';
 const CR = 0x0d;
 const LF = 0x0a;
+const MAX_PARSER_BUFFER = 64 * 1024 * 1024; // 64 MB max parser buffer
 
 class RespParser {
     constructor() {
@@ -11,6 +12,10 @@ class RespParser {
 
     append(chunk) {
         this._buffer = Buffer.concat([this._buffer, chunk]);
+        if (this._buffer.length > MAX_PARSER_BUFFER) {
+            this._buffer = Buffer.alloc(0);
+            throw new Error('RESP parser buffer exceeded maximum size (' + MAX_PARSER_BUFFER + ' bytes)');
+        }
     }
 
     parse() {

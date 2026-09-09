@@ -1,26 +1,54 @@
 'use strict';
 
-const { describe, it, afterEach } = require('node:test');
+const { describe, it, afterEach, beforeEach } = require('node:test');
 const assert = require('node:assert');
 const net = require('net');
+const fs = require('fs');
+const path = require('path');
 const { RedisGenServer } = require('../src/server');
+
+const TEST_DIR = path.join(__dirname, '.tmp_integ_test');
 
 let server;
 let serverPort = 16379;
 
-function startServer(port) {
+function cleanDir(dir) {
+    if (fs.existsSync(dir)) {
+        fs.rmSync(dir, { recursive: true, force: true });
+    }
+}
+
+function startServer(port, options = {}) {
+    cleanDir(TEST_DIR);
+    fs.mkdirSync(TEST_DIR, { recursive: true });
+
     return new Promise((resolve) => {
-        server = new RedisGenServer({ port: port, bind: '127.0.0.1', loglevel: 'warning' });
+        server = new RedisGenServer(Object.assign({
+            port: port,
+            bind: '127.0.0.1',
+            loglevel: 'warning',
+            dir: TEST_DIR,
+            save: [],
+            ws_port: 0
+        }, options));
         server.start();
         setTimeout(resolve, 200);
     });
 }
 
 function stopServer() {
-    if (server) {
-        server.stop();
-        server = null;
-    }
+    return new Promise((resolve) => {
+        if (server) {
+            server.stop(() => {
+                server = null;
+                cleanDir(TEST_DIR);
+                resolve();
+            });
+        } else {
+            cleanDir(TEST_DIR);
+            resolve();
+        }
+    });
 }
 
 function sendCommand(port, ...cmds) {
@@ -46,7 +74,7 @@ function sendCommand(port, ...cmds) {
             setTimeout(() => {
                 client.end();
                 resolve(resp);
-            }, 100);
+            }, 120);
         });
 
         client.on('error', reject);
@@ -54,8 +82,12 @@ function sendCommand(port, ...cmds) {
 }
 
 describe('Integration Tests', () => {
-    afterEach(() => {
-        stopServer();
+    beforeEach(() => {
+        cleanDir(TEST_DIR);
+    });
+
+    afterEach(async () => {
+        await stopServer();
     });
 
     it('server starts and responds to PING', async () => {
@@ -136,5 +168,23 @@ describe('Integration Tests', () => {
 
         const r2 = await sendCommand(port, 'GET delme');
         assert.ok(r2.includes('$-1'));
+    });
+
+    it('TCP authentication gate enforcement with requirepass', async () => {
+        const port = serverPort++;
+        await startServer(port, { requirepass: 'secretpass123' });
+
+        // 1. Without AUTH, command is rejected with NOAUTH
+        const r1 = await sendCommand(port, 'GET testkey');
+        assert.ok(r1.includes('NOAUTH'), 'Expected NOAUTH error');
+
+        // 2. Wrong password returns WRONGPASS
+        const r2 = await sendCommand(port, 'AUTH wrongpass');
+        assert.ok(r2.includes('WRONGPASS'), 'Expected WRONGPASS error');
+
+        // 3. Successful AUTH unlocks commands
+        const r3 = await sendCommand(port, 'AUTH secretpass123', 'SET testkey myval', 'GET testkey');
+        assert.ok(r3.includes('+OK'));
+        assert.ok(r3.includes('myval'));
     });
 });

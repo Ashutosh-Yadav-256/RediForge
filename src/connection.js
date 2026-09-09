@@ -6,7 +6,7 @@ var encoder = require('./protocol/encoder');
 
 var nextConnectionId = 1;
 
-var PRE_AUTH_ALLOWED = { auth: true, quit: true, ping: true, hello: true };
+var PRE_AUTH_ALLOWED = { auth: true, quit: true, hello: true };
 
 function ClientConnection(socket, server) {
     this.id = nextConnectionId++;
@@ -20,6 +20,7 @@ function ClientConnection(socket, server) {
     this.patternSubs = null;
     this.closing = false;
     this.authenticated = false;
+    this.username = null;
     this.remoteAddr = socket.remoteAddress + ':' + socket.remotePort;
 
     this._bindEvents();
@@ -35,7 +36,9 @@ ClientConnection.prototype._bindEvents = function () {
 };
 
 ClientConnection.prototype._needsAuth = function () {
-    return false;
+    if (!this.server || !this.server.config) return false;
+    var pass = this.server.config.get('requirepass');
+    return !this.authenticated && !!pass;
 };
 
 ClientConnection.prototype._onData = function (chunk) {

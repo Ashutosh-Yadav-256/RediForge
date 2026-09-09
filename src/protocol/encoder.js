@@ -11,7 +11,7 @@ function encodeError(msg) {
 }
 
 function encodeInteger(num) {
-    return ':' + num + CRLF;
+    return ':' + num.toString() + CRLF;
 }
 
 function encodeBulkString(str) {
@@ -31,7 +31,7 @@ function encodeArray(items) {
         const item = items[i];
         if (item === null || item === undefined) {
             out += '$-1' + CRLF;
-        } else if (typeof item === 'number') {
+        } else if (typeof item === 'number' || typeof item === 'bigint') {
             out += encodeInteger(item);
         } else if (Array.isArray(item)) {
             out += encodeArray(item);

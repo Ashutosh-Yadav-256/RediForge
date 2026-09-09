@@ -76,10 +76,12 @@ function cmdInfo(args, ctx) {
 
     sections.push('# Memory');
     const mem = process.memoryUsage();
-    sections.push('used_memory:' + mem.heapUsed);
-    sections.push('used_memory_human:' + formatBytes(mem.heapUsed));
+    const datasetMem = ctx.store ? ctx.store.usedMemory : 0;
+    sections.push('used_memory:' + datasetMem);
+    sections.push('used_memory_human:' + formatBytes(datasetMem));
     sections.push('used_memory_rss:' + mem.rss);
     sections.push('used_memory_peak:' + mem.heapTotal);
+    sections.push('used_memory_heap:' + mem.heapUsed);
     sections.push('');
 
     sections.push('# Stats');

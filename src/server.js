@@ -59,7 +59,7 @@ RedisGenServer.prototype.start = function () {
     }
 
     var wsPort = this.config.get('ws_port');
-    if (wsPort) {
+    if (wsPort && wsPort > 0) {
         this._bridge = new WebSocketBridge(this);
         this._bridge.start(wsPort, '0.0.0.0');
     }
@@ -169,7 +169,7 @@ RedisGenServer.prototype._setupShutdown = function () {
     process.on('SIGTERM', graceful);
 };
 
-RedisGenServer.prototype.stop = function () {
+RedisGenServer.prototype.stop = function (callback) {
     this.store.expiry.stopActiveSweep();
     this.rdb.stopAutoSave();
     this.aof.close();
@@ -185,8 +185,12 @@ RedisGenServer.prototype.stop = function () {
     this._clients.clear();
 
     if (this._server) {
-        this._server.close();
+        this._server.close(function () {
+            if (callback) callback();
+        });
         this._server = null;
+    } else if (callback) {
+        callback();
     }
 };
 

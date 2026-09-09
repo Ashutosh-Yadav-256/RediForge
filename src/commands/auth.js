@@ -14,16 +14,22 @@ function timingSafeEqual(a, b) {
 }
 
 function cmdAuth(args, ctx) {
-    if (args.length !== 1) return encoder.wrongArgCount('auth');
+    if (args.length < 1 || args.length > 2) return encoder.wrongArgCount('auth');
 
-    var pass = ctx.config.get('requirepass');
+    var password = args.length === 2 ? args[1] : args[0];
+    var username = args.length === 2 ? args[0] : 'default';
+
+    var pass = ctx.config ? ctx.config.get('requirepass') : null;
 
     if (!pass || pass.length === 0) {
         return encoder.encodeError('ERR Client sent AUTH, but no password is set');
     }
 
-    if (timingSafeEqual(args[0], pass)) {
-        ctx.connection.authenticated = true;
+    if (username === 'default' && timingSafeEqual(password, pass)) {
+        if (ctx.connection) {
+            ctx.connection.authenticated = true;
+            ctx.connection.username = username;
+        }
         return encoder.ok();
     }
 

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: redisgen
+    name: rediforge
     runtime: docker
     repo: https://github.com/Ashutosh-Yadav-256/Build-Redis-In-JAVA
     branch: main
@@ -8,6 +8,6 @@ services:
     healthCheckPath: /health
     envVars:
       - key: REDIS_PASSWORD
-        sync: false
+        generateValue: true
       - key: PORT
         value: 10000
