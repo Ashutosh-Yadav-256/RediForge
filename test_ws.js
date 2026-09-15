@@ -1,5 +1,5 @@
 const WebSocket = require('ws');
-const ws = new WebSocket('wss://redisgen.onrender.com');
+const ws = new WebSocket('wss://rediforge.onrender.com');
 
 ws.on('open', () => {
     console.log('Connected');

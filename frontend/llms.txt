@@ -1,0 +1,40 @@
+# RediForge
+
+> High-performance, zero-dependency, 100% RESP2 wire-compatible in-memory datastore with dual persistence (RDB + AOF), real-time WebSocket telemetry, and multi-database RBAC.
+
+RediForge is an enterprise-grade in-memory database and caching system engineered from first principles in Node.js with zero external runtime dependencies. It supports standard Redis client libraries (redis-py, ioredis, Jedis) over TCP port 6379, real-time telemetry over WebSockets (wss://rediforge.in), and 16 isolated logical databases.
+
+## Core Documentation
+
+- [System Architecture & Whitepaper](https://rediforge.in/architecture): Deep-dive into the zero-copy RESP2 parser, memory accounting, probabilistic active expiry (100ms cron), and dual-phase eviction subsystems.
+- [Technical Docs & Protocols](https://rediforge.in/docs): Complete reference for RESP2 protocol compliance, wire serialization formats, and transaction isolation semantics (MULTI/EXEC).
+- [Cluster Status & Diagnostics](https://rediforge.in/status): Live operational cluster health, round-trip latency (RTT) diagnostics, uptime tracking, and SLA guarantees (99.99%).
+- [Console Dashboard](https://rediforge.in/dashboard): Interactive web-based management suite featuring live memory telemetry, Web CLI terminal, and key browser.
+- [Help Center & FAQ](https://rediforge.in/help): Frequently asked questions on client connections, persistence configuration, API bearer keys, and dangerous action safeguards.
+- [Support Ticket Portal](https://rediforge.in/support): Direct engineering support and diagnostic telemetry ticket submission.
+
+## Key Technical Specifications
+
+- **Protocol Compatibility:** 100% RESP2 wire compatibility (Simple Strings, Errors, Integers, Bulk Strings, Arrays).
+- **Throughput & Latency:** 235,000+ operations/second with sub-millisecond execution latency.
+- **Persistence Subsystem:** Binary RDB point-in-time snapshots (`dump.rdb`) and Append-Only File (`appendonly.aof`) write-ahead transaction logging with configurable fsync policies (`always`, `everysec`, `no`).
+- **Memory Management:** Passive on-access expiration + active probabilistic 100ms cron sampling with LRU eviction safeguards.
+- **Supported Data Structures:** Strings, Hashes, Doubly-Linked Lists, Unique Sets, Score-Ranked Sorted Sets (ZSet), Transactions (MULTI/EXEC/DISCARD), Pub/Sub channels.
+- **Security & Access Control:** Role-Based Access Control (RBAC), RS256 Google OAuth verification, HMAC-SHA256 bearer tokens, SSRF protection filters, and dangerous command confirmation guards (FLUSHALL/FLUSHDB).
+
+## Key Facts
+
+- **Lead Architect:** Ashutosh Yadav
+- **Author Portfolio:** https://ashutoshwork.space/
+- **LinkedIn:** https://www.linkedin.com/in/ashutoshyadav256
+- **Contact Email:** ashutosh4tech@gmail.com
+- **GitHub Repository:** https://github.com/Ashutosh-Yadav-256/RediForge
+- **Live Production URL:** https://rediforge.in
+- **Operating Systems:** Linux, macOS, Windows, Docker container runtimes
+
+## Legal & Compliance
+
+- [Privacy Policy](https://rediforge.in/privacy): Authenticated session token security, in-memory telemetry handling, and GDPR/CCPA data rights.
+- [Terms of Service](https://rediforge.in/terms): Service terms, acceptable datastore usage, and uptime policies.
+- [Security Policy](https://rediforge.in/security): Asymmetric cryptographic verification, SSRF defense-in-depth, and rate limiting.
+- [Cookie Policy](https://rediforge.in/cookies): Zero third-party ad tracking; strictly necessary session cookies only.

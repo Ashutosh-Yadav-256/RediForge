@@ -168,23 +168,23 @@ function cmdGetdel(args, ctx) {
 }
 
 function cmdIncr(args, ctx) {
-    return incrByGeneric(args, ctx, 1, 'incr');
+    return incrByGeneric(args, ctx, 1n, 'incr');
 }
 
 function cmdDecr(args, ctx) {
-    return incrByGeneric(args, ctx, -1, 'decr');
+    return incrByGeneric(args, ctx, -1n, 'decr');
 }
 
 function cmdIncrby(args, ctx) {
     if (args.length !== 2) return encoder.wrongArgCount('incrby');
-    var increment = validate.strictParseInt(args[1]);
+    var increment = validate.strictParseBigInt(args[1]);
     if (increment === null) return encoder.encodeError('ERR value is not an integer or out of range');
     return incrByGeneric([args[0]], ctx, increment, 'incrby');
 }
 
 function cmdDecrby(args, ctx) {
     if (args.length !== 2) return encoder.wrongArgCount('decrby');
-    var decrement = validate.strictParseInt(args[1]);
+    var decrement = validate.strictParseBigInt(args[1]);
     if (decrement === null) return encoder.encodeError('ERR value is not an integer or out of range');
     return incrByGeneric([args[0]], ctx, -decrement, 'decrby');
 }
@@ -225,21 +225,23 @@ function incrByGeneric(args, ctx, delta, cmdName) {
     }
 
     var current = ctx.store.get(ctx.db, key);
+    var currentBig;
     if (current === undefined) {
-        current = 0;
+        currentBig = 0n;
     } else {
-        current = validate.strictParseInt(current);
-        if (current === null) {
+        currentBig = validate.strictParseBigInt(current);
+        if (currentBig === null) {
             return encoder.encodeError('ERR value is not an integer or out of range');
         }
     }
 
-    var result = current + delta;
-    if (result > validate.INT_MAX || result < validate.INT_MIN) {
+    var deltaBig = typeof delta === 'bigint' ? delta : BigInt(delta);
+    var result = currentBig + deltaBig;
+    if (result > validate.INT64_MAX || result < validate.INT64_MIN) {
         return encoder.encodeError('ERR increment or decrement would overflow');
     }
 
-    ctx.store.set(ctx.db, key, String(result), TYPE_STRING);
+    ctx.store.set(ctx.db, key, result.toString(), TYPE_STRING);
 
     return encoder.integerReply(result);
 }

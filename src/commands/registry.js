@@ -133,9 +133,9 @@ reg('auth', authCmds.auth, 'r');
 const TX_PASSTHROUGH = new Set(['exec', 'discard', 'multi', 'watch']);
 
 function dispatch(cmdParts, ctx) {
-    if (!cmdParts || cmdParts.length === 0) return null;
+    if (!cmdParts || cmdParts.length === 0 || cmdParts[0] == null) return null;
 
-    const cmdName = cmdParts[0].toLowerCase();
+    const cmdName = String(cmdParts[0]).toLowerCase();
     const cmdArgs = cmdParts.slice(1);
 
     const entry = TABLE[cmdName];

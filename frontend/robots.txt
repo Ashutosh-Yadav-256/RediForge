@@ -1,0 +1,47 @@
+# ==============================================================================
+# RediForge Robots & AI Crawler Directives (GEO & SEO Standards)
+# ==============================================================================
+
+# Search Engine Crawlers & Standard Indexers
+User-agent: *
+Allow: /
+
+# Tier 1 AI Search & Answer Engine Bots (Full Access Granted)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# IETF Draft AI Content Preferences & Permissions
+Content-Signal: ai-train=yes, search=yes, ai-personalization=yes, ai-retrieval=yes
+
+# Sitemaps & LLM Context Files
+Sitemap: https://rediforge.in/sitemap.xml

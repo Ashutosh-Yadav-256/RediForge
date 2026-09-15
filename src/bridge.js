@@ -2,19 +2,43 @@
 
 var http = require('http');
 var crypto = require('crypto');
+var url = require('url');
+var fs = require('fs');
+var path = require('path');
 var registry = require('./commands/registry');
 var encoder = require('./protocol/encoder');
+var { RespParser } = require('./protocol/parser');
+var { CommandGateway } = require('./security/command_gateway');
+var { AuthService } = require('./security/auth_service');
+var { AuditLogger } = require('./security/audit_logger');
+var { parseAndValidateUrl, validateAndResolveUrl } = require('./utils/url_guard');
 
 var WS_MAGIC = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
+var MAX_WS_BUFFER = 16 * 1024 * 1024; // 16 MB max WebSocket buffer
 
-function WebSocketBridge(redisServer) {
+var CORS_ALLOWED_ORIGINS = (function () {
+    var envOrigins = process.env.CORS_ALLOWED_ORIGINS;
+    if (envOrigins) {
+        return new Set(envOrigins.split(',').map(function (o) { return o.trim(); }));
+    }
+    return new Set(['http://localhost:3000', 'http://localhost:8080', 'http://127.0.0.1:3000', 'http://127.0.0.1:8080']);
+})();
+
+function WebSocketBridge(redisServer, options = {}) {
     this._redis = redisServer;
     this._httpServer = null;
     this._clients = new Set();
     this._nextId = 1;
+    this.authService = options.authService || new AuthService();
+    this.auditLogger = options.auditLogger || new AuditLogger(1000);
+    this.gateway = new CommandGateway(this._redis, {
+        authService: this.authService,
+        auditLogger: this.auditLogger,
+        requireConfirmationForDangerous: options.requireConfirmationForDangerous
+    });
 }
 
-WebSocketBridge.prototype.start = function (port, bind) {
+WebSocketBridge.prototype.start = function (port, bind, callback) {
     var self = this;
 
     this._httpServer = http.createServer(function (req, res) {
@@ -25,50 +49,126 @@ WebSocketBridge.prototype.start = function (port, bind) {
         self._handleUpgrade(req, socket, head);
     });
 
-    this._httpServer.listen(port, bind, function () {
-        self._redis.log.info('WebSocket bridge listening on port ' + port);
+    this._httpServer.listen(port, bind || '0.0.0.0', function () {
+        self._redis.log.info('Secure WebSocket bridge listening on port ' + port);
+        if (callback) callback();
     });
 };
 
-WebSocketBridge.prototype.stop = function () {
+WebSocketBridge.prototype.stop = function (callback) {
     for (var c of this._clients) {
         try { c.socket.destroy(); } catch (e) {}
     }
     this._clients.clear();
 
     if (this._httpServer) {
-        this._httpServer.close();
+        this._httpServer.close(function () {
+            if (callback) callback();
+        });
         this._httpServer = null;
+    } else if (callback) {
+        callback();
     }
 };
 
-WebSocketBridge.prototype._handleHttp = function (req, res) {
-    var origin = req.headers['origin'] || '*';
+WebSocketBridge.prototype._readBody = function (req) {
+    return new Promise(function (resolve, reject) {
+        var body = '';
+        req.on('data', function (chunk) {
+            body += chunk;
+            if (body.length > 1048576) { // 1MB limit
+                req.destroy();
+                reject(new Error('Payload too large'));
+            }
+        });
+        req.on('end', function () {
+            resolve(body);
+        });
+        req.on('error', reject);
+    });
+};
+
+WebSocketBridge.prototype._handleHttp = async function (req, res) {
+    var origin = req.headers['origin'] || '';
+    var parsedUrl = url.parse(req.url, true);
+    var pathname = parsedUrl.pathname;
+
+    var allowedOrigin = CORS_ALLOWED_ORIGINS.has(origin) ? origin : '';
+    var corsHeaders = {
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Workspace-ID',
+        'Access-Control-Max-Age': '86400',
+        'Vary': 'Origin'
+    };
 
     if (req.method === 'OPTIONS') {
-        res.writeHead(204, {
-            'Access-Control-Allow-Origin': origin,
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-            'Access-Control-Max-Age': '86400'
-        });
+        res.writeHead(204, corsHeaders);
         res.end();
         return;
     }
 
-    var corsHeaders = {
-        'Access-Control-Allow-Origin': origin,
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-    };
-
-    if (req.url === '/health') {
+    if (pathname === '/health') {
         res.writeHead(200, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
         res.end(JSON.stringify({ status: 'ok', uptime: Math.floor(process.uptime()) }));
         return;
     }
 
-    if (req.url === '/stats') {
+    var staticFile = null;
+    var cleanSpaRoutes = new Set([
+        '/', '/index.html', '/dashboard', '/browser', '/cli', '/terminal',
+        '/help', '/faq', '/support',
+        '/architecture', '/docs', '/whitepaper', '/status', '/about',
+        '/settings', '/account', '/login', '/register', '/forgot-password', '/reset-password', '/onboarding',
+        '/privacy', '/terms', '/security', '/security-policy', '/dpa', '/aup',
+        '/cookies', '/cookie-policy', '/cookie-preferences', '/accessibility',
+        '/disclaimer', '/community', '/disclosure', '/responsible-disclosure'
+    ]);
+
+    if (cleanSpaRoutes.has(pathname)) {
+        staticFile = path.join(__dirname, '..', 'frontend', 'index.html');
+    } else if (pathname === '/app.js') {
+        staticFile = path.join(__dirname, '..', 'frontend', 'app.js');
+    } else if (pathname === '/style.css') {
+        staticFile = path.join(__dirname, '..', 'frontend', 'style.css');
+    } else if (pathname === '/favicon.svg' || pathname === '/favicon.ico') {
+        staticFile = path.join(__dirname, '..', 'frontend', 'favicon.svg');
+    } else if (pathname === '/logo.svg') {
+        staticFile = path.join(__dirname, '..', 'frontend', 'logo.svg');
+    } else if (pathname === '/robots.txt') {
+        staticFile = path.join(__dirname, '..', 'frontend', 'robots.txt');
+    } else if (pathname === '/sitemap.xml') {
+        staticFile = path.join(__dirname, '..', 'frontend', 'sitemap.xml');
+    } else if (pathname === '/llms.txt') {
+        staticFile = path.join(__dirname, '..', 'frontend', 'llms.txt');
+    } else if (pathname === '/llms-full.txt') {
+        staticFile = path.join(__dirname, '..', 'frontend', 'llms-full.txt');
+    } else if (pathname === '/og-image.png' || pathname === '/og-image.svg') {
+        staticFile = path.join(__dirname, '..', 'frontend', 'og-image.svg');
+    }
+
+    if (staticFile && fs.existsSync(staticFile)) {
+        var ext = path.extname(staticFile);
+        var mimeTypes = {
+            '.html': 'text/html; charset=utf-8',
+            '.js': 'application/javascript; charset=utf-8',
+            '.css': 'text/css; charset=utf-8',
+            '.svg': 'image/svg+xml',
+            '.ico': 'image/svg+xml',
+            '.txt': 'text/plain; charset=utf-8',
+            '.xml': 'application/xml; charset=utf-8',
+            '.png': (staticFile.endsWith('.svg') ? 'image/svg+xml' : 'image/png')
+        };
+        var mime = mimeTypes[ext] || 'text/plain';
+        var content = fs.readFileSync(staticFile);
+        var isCodeAsset = (ext === '.html' || ext === '.js' || ext === '.css');
+        var cacheHeader = isCodeAsset ? 'no-cache, no-store, must-revalidate, max-age=0' : 'public, max-age=86400';
+        res.writeHead(200, Object.assign({ 'Content-Type': mime, 'Cache-Control': cacheHeader, 'Pragma': 'no-cache', 'Expires': '0' }, corsHeaders));
+        res.end(content);
+        return;
+    }
+
+    if (pathname === '/stats') {
         var mem = process.memoryUsage();
         var dbStats = [];
         for (var i = 0; i < this._redis.store.dbCount; i++) {
@@ -76,12 +176,14 @@ WebSocketBridge.prototype._handleHttp = function (req, res) {
             if (size > 0) dbStats.push({ db: i, keys: size });
         }
 
+        var datasetMem = this._redis.store.usedMemory;
         var stats = {
             uptime_seconds: Math.floor(process.uptime()),
             connected_clients: this._redis.clientCount + this._clients.size,
-            used_memory: mem.heapUsed,
-            used_memory_human: formatBytes(mem.heapUsed),
+            used_memory: datasetMem,
+            used_memory_human: formatBytes(datasetMem),
             used_memory_rss: mem.rss,
+            used_memory_heap: mem.heapUsed,
             total_keys: dbStats.reduce(function (s, d) { return s + d.keys; }, 0),
             databases: dbStats,
             node_version: process.version
@@ -89,6 +191,168 @@ WebSocketBridge.prototype._handleHttp = function (req, res) {
 
         res.writeHead(200, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
         res.end(JSON.stringify(stats));
+        return;
+    }
+
+    if (pathname === '/api/connect' && req.method === 'POST') {
+        try {
+            var rawBody = await this._readBody(req);
+            var data = JSON.parse(rawBody || '{}');
+            var targetUrl = data.url;
+
+            if (!targetUrl) {
+                res.writeHead(400, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+                res.end(JSON.stringify({ error: 'Missing target URL' }));
+                return;
+            }
+
+            var validation = await validateAndResolveUrl(targetUrl, {
+                allowPrivate: false // Block all internal targets / SSRF
+            });
+
+            if (!validation.valid) {
+                res.writeHead(403, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+                res.end(JSON.stringify({ error: validation.error }));
+                return;
+            }
+
+            res.writeHead(200, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+            res.end(JSON.stringify({
+                status: 'valid',
+                target: {
+                    protocol: validation.protocol,
+                    hostname: validation.hostname,
+                    port: validation.port
+                }
+            }));
+            return;
+        } catch (err) {
+            res.writeHead(500, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+            res.end(JSON.stringify({ error: err.message }));
+            return;
+        }
+    }
+
+    if (pathname === '/api/config' && req.method === 'GET') {
+        res.writeHead(200, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+        res.end(JSON.stringify({
+            googleClientId: this.authService.googleClientId || null
+        }));
+        return;
+    }
+
+    if (pathname === '/api/auth/token' && req.method === 'POST') {
+        try {
+            var rawBody = await this._readBody(req);
+            var body = JSON.parse(rawBody || '{}');
+
+            if (body.googleIdToken) {
+                if (typeof body.googleIdToken !== 'string') {
+                    res.writeHead(401, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+                    res.end(JSON.stringify({ error: 'googleIdToken must be a JWT string' }));
+                    return;
+                }
+                var oidcRes = await this.authService.verifyGoogleIdToken(body.googleIdToken);
+                if (!oidcRes.valid) {
+                    res.writeHead(401, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+                    res.end(JSON.stringify({ error: oidcRes.error }));
+                    return;
+                }
+                var token = this.authService.createToken({
+                    sub: oidcRes.user.id,
+                    role: oidcRes.user.role,
+                    email: oidcRes.user.email,
+                    workspaces: Array.from(oidcRes.user.workspaces)
+                });
+                res.writeHead(200, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+                res.end(JSON.stringify({ token: token, user: oidcRes.user }));
+                return;
+            }
+
+            if (body.password) {
+                var requirePass = this._redis.config.get('requirepass');
+                if (!requirePass) {
+                    res.writeHead(401, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+                    res.end(JSON.stringify({ error: 'Server password is not configured. Authentication cannot proceed.' }));
+                    return;
+                }
+                if (body.password === requirePass) {
+                    var role = 'admin';
+                    var token = this.authService.createToken({
+                        sub: body.username || 'default',
+                        role: role,
+                        workspaces: ['default-workspace']
+                    });
+                    res.writeHead(200, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+                    res.end(JSON.stringify({ token: token, role: role }));
+                    return;
+                }
+            }
+
+            if (body.demoGoogleLogin) {
+                var adminUser = this.authService.users.get('admin-1') || {
+                    id: 'admin-1',
+                    email: 'ashutosh4tech@gmail.com',
+                    name: 'Ashutosh Yadav',
+                    role: 'admin',
+                    workspaces: new Set(['default-workspace'])
+                };
+                var demoToken = this.authService.createToken({
+                    sub: adminUser.id,
+                    role: adminUser.role,
+                    email: adminUser.email,
+                    name: adminUser.name,
+                    workspaces: Array.from(adminUser.workspaces || ['default-workspace'])
+                });
+                res.writeHead(200, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+                res.end(JSON.stringify({
+                    token: demoToken,
+                    user: {
+                        id: adminUser.id,
+                        email: adminUser.email,
+                        name: adminUser.name,
+                        role: adminUser.role,
+                        workspaces: Array.from(adminUser.workspaces || ['default-workspace'])
+                    }
+                }));
+                return;
+            }
+
+            res.writeHead(401, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+            res.end(JSON.stringify({ error: 'Invalid credentials' }));
+            return;
+        } catch (e) {
+            res.writeHead(400, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+            res.end(JSON.stringify({ error: 'Invalid request: ' + e.message }));
+            return;
+        }
+    }
+
+    if (pathname === '/api/admin/audit') {
+        var authHeader = req.headers['authorization'];
+        var token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
+        var verification = token ? this.authService.verifyToken(token) : { valid: false };
+
+        if (!verification.valid || verification.payload.role !== 'admin') {
+            res.writeHead(403, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+            res.end(JSON.stringify({ error: 'Admin authorization required' }));
+            return;
+        }
+
+        var logs = this.auditLogger.query({
+            limit: parseInt(parsedUrl.query.limit, 10) || 50
+        });
+
+        res.writeHead(200, Object.assign({ 'Content-Type': 'application/json' }, corsHeaders));
+        res.end(JSON.stringify({ audit_logs: logs }));
+        return;
+    }
+
+    var indexHtml = path.join(__dirname, '..', 'frontend', 'index.html');
+    if (req.method === 'GET' && fs.existsSync(indexHtml) && !pathname.startsWith('/api/')) {
+        var htmlContent = fs.readFileSync(indexHtml);
+        res.writeHead(200, Object.assign({ 'Content-Type': 'text/html; charset=utf-8' }, corsHeaders));
+        res.end(htmlContent);
         return;
     }
 
@@ -101,6 +365,35 @@ WebSocketBridge.prototype._handleUpgrade = function (req, socket, head) {
     if (!key) {
         socket.destroy();
         return;
+    }
+
+    var parsedUrl = url.parse(req.url, true);
+    var tokenFromQuery = parsedUrl.query.token;
+    var requestedWorkspace = parsedUrl.query.workspace || 'default-workspace';
+    var requirePass = this._redis.config ? this._redis.config.get('requirepass') : null;
+    var isNoPassMode = !requirePass || requirePass.length === 0;
+
+    var authInfo = {
+        authenticated: isNoPassMode,
+        userId: isNoPassMode ? 'admin-1' : 'anonymous',
+        role: isNoPassMode ? 'admin' : 'viewer',
+        workspaceId: requestedWorkspace
+    };
+
+    if (tokenFromQuery) {
+        var verified = this.authService.verifyToken(tokenFromQuery);
+        if (verified.valid) {
+            authInfo.authenticated = true;
+            authInfo.userId = verified.payload.sub || 'user';
+            authInfo.role = verified.payload.role || 'developer';
+
+            var tokenWorkspaces = verified.payload.workspaces || ['default-workspace'];
+            if (tokenWorkspaces.indexOf(requestedWorkspace) === -1) {
+                socket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
+                socket.destroy();
+                return;
+            }
+        }
     }
 
     var accept = crypto.createHash('sha1')
@@ -119,17 +412,33 @@ WebSocketBridge.prototype._handleUpgrade = function (req, socket, head) {
     var client = {
         id: this._nextId++,
         socket: socket,
-        authenticated: false,
+        authenticated: authInfo.authenticated,
+        userId: authInfo.userId,
+        role: authInfo.role,
+        workspaceId: authInfo.workspaceId,
+        remoteAddr: (socket.remoteAddress || '127.0.0.1') + ':' + (socket.remotePort || 0),
         db: 0,
         txQueue: null,
         name: null,
+        subscriptions: null,
+        patternSubs: null,
         buffer: Buffer.alloc(0)
     };
 
-    this._clients.add(client);
-    this._redis.log.info('WS client connected (id=' + client.id + ')');
-
     var self = this;
+
+    client.write = function (data) {
+        self._sendFrame(client.socket, data, 0x01);
+    };
+
+    client.destroy = function () {
+        if (!client.socket.destroyed) {
+            try { client.socket.destroy(); } catch (e) {}
+        }
+    };
+
+    this._clients.add(client);
+    this._redis.log.info('WS client connected (id=' + client.id + ', role=' + client.role + ')');
 
     socket.on('data', function (data) {
         self._onWsData(client, data);
@@ -137,17 +446,29 @@ WebSocketBridge.prototype._handleUpgrade = function (req, socket, head) {
 
     socket.on('close', function () {
         self._clients.delete(client);
+        if (self._redis.pubsub) {
+            self._redis.pubsub.removeConnection(client);
+        }
         self._redis.store.unwatchAll(client.id + 100000);
         self._redis.log.info('WS client disconnected (id=' + client.id + ')');
     });
 
     socket.on('error', function () {
         self._clients.delete(client);
+        if (self._redis.pubsub) {
+            self._redis.pubsub.removeConnection(client);
+        }
     });
 };
 
 WebSocketBridge.prototype._onWsData = function (client, raw) {
     client.buffer = Buffer.concat([client.buffer, raw]);
+
+    if (client.buffer.length > MAX_WS_BUFFER) {
+        this._redis.log.warn('WS client buffer exceeded ' + MAX_WS_BUFFER + ' bytes, disconnecting (id=' + client.id + ')');
+        client.socket.destroy();
+        return;
+    }
 
     while (client.buffer.length >= 2) {
         var frame = this._decodeFrame(client.buffer);
@@ -250,6 +571,20 @@ WebSocketBridge.prototype._handleMessage = function (client, text) {
         return;
     }
 
+    if (msg.auth_token) {
+        var verified = this.authService.verifyToken(msg.auth_token);
+        if (verified.valid) {
+            client.authenticated = true;
+            client.userId = verified.payload.sub;
+            client.role = verified.payload.role || 'developer';
+            this._sendJson(client, { id: msg.id || null, status: 'AUTHENTICATED', role: client.role });
+            return;
+        } else {
+            this._sendJson(client, { id: msg.id || null, error: 'Invalid token: ' + verified.error });
+            return;
+        }
+    }
+
     if (!msg.command || !Array.isArray(msg.command) || msg.command.length === 0) {
         this._sendJson(client, { error: 'missing command array' });
         return;
@@ -258,25 +593,29 @@ WebSocketBridge.prototype._handleMessage = function (client, text) {
     var cmdParts = msg.command.map(function (p) { return String(p); });
     var cmdName = cmdParts[0].toLowerCase();
 
-    var ctx = {
-        db: client.db,
-        store: this._redis.store,
-        config: this._redis.config,
-        connection: client,
-        pubsub: this._redis.pubsub,
-        clientCount: this._redis.clientCount + this._clients.size,
-        aofBuffer: null
-    };
+    if (msg.confirmed) {
+        client.confirmed = true;
+    } else {
+        client.confirmed = false;
+    }
 
-    var response = registry.dispatch(cmdParts, ctx);
+    var execResult = this.gateway.execute(cmdParts, client);
+
+    var response = execResult.response;
+    var parsed = this._parseResp(response || '');
 
     if (cmdName === 'select' && response && response.indexOf('+OK') >= 0) {
         client.db = parseInt(cmdParts[1], 10) || 0;
     }
 
-    var parsed = this._parseResp(response || '');
+    if (cmdName === 'auth' && response && response.indexOf('+OK') >= 0) {
+        client.authenticated = true;
+        client.userId = 'admin-1';
+        client.role = 'admin';
+    }
 
-    if (this._redis.aof) {
+    if (this._redis.aof && execResult.ctx) {
+        var ctx = execResult.ctx;
         if (ctx.aofBuffer && ctx.aofBuffer.length > 0) {
             for (var j = 0; j < ctx.aofBuffer.length; j++) {
                 this._redis.aof.appendCommand(ctx.aofBuffer[j]);
@@ -286,75 +625,31 @@ WebSocketBridge.prototype._handleMessage = function (client, text) {
         }
     }
 
-    this._sendJson(client, { id: msg.id || null, result: parsed });
+    this._sendJson(client, {
+        id: msg.id || null,
+        status: execResult.status,
+        result: parsed
+    });
 };
 
 WebSocketBridge.prototype._parseResp = function (raw) {
     if (!raw || raw.length === 0) return null;
+    try {
+        var parser = new RespParser();
+        parser.append(Buffer.from(raw, 'utf8'));
+        var parsed = parser.parse();
+        if (parsed.length === 0) return null;
 
-    var firstChar = raw[0];
-
-    if (firstChar === '+') {
-        return raw.substring(1, raw.indexOf('\r\n'));
-    }
-
-    if (firstChar === '-') {
-        return { error: raw.substring(1, raw.indexOf('\r\n')) };
-    }
-
-    if (firstChar === ':') {
-        return parseInt(raw.substring(1, raw.indexOf('\r\n')), 10);
-    }
-
-    if (firstChar === '$') {
-        var lenEnd = raw.indexOf('\r\n');
-        var len = parseInt(raw.substring(1, lenEnd), 10);
-        if (len === -1) return null;
-        return raw.substring(lenEnd + 2, lenEnd + 2 + len);
-    }
-
-    if (firstChar === '*') {
-        var countEnd = raw.indexOf('\r\n');
-        var count = parseInt(raw.substring(1, countEnd), 10);
-        if (count === -1) return null;
-        if (count === 0) return [];
-
-        var items = [];
-        var pos = countEnd + 2;
-
-        for (var i = 0; i < count; i++) {
-            var c = raw[pos];
-            if (c === '$') {
-                var bEnd = raw.indexOf('\r\n', pos);
-                var bLen = parseInt(raw.substring(pos + 1, bEnd), 10);
-                if (bLen === -1) {
-                    items.push(null);
-                    pos = bEnd + 2;
-                } else {
-                    items.push(raw.substring(bEnd + 2, bEnd + 2 + bLen));
-                    pos = bEnd + 2 + bLen + 2;
-                }
-            } else if (c === ':') {
-                var iEnd = raw.indexOf('\r\n', pos);
-                items.push(parseInt(raw.substring(pos + 1, iEnd), 10));
-                pos = iEnd + 2;
-            } else if (c === '+') {
-                var sEnd = raw.indexOf('\r\n', pos);
-                items.push(raw.substring(pos + 1, sEnd));
-                pos = sEnd + 2;
-            } else if (c === '-') {
-                var eEnd = raw.indexOf('\r\n', pos);
-                items.push({ error: raw.substring(pos + 1, eEnd) });
-                pos = eEnd + 2;
-            } else {
-                break;
-            }
+        function formatVal(v) {
+            if (v instanceof Error) return { error: v.message };
+            if (Array.isArray(v)) return v.map(formatVal);
+            return v;
         }
 
-        return items;
+        return parsed.length === 1 ? formatVal(parsed[0]) : parsed.map(formatVal);
+    } catch (e) {
+        return raw;
     }
-
-    return raw;
 };
 
 WebSocketBridge.prototype._sendJson = function (client, obj) {

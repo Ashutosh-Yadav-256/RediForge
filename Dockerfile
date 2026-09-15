@@ -1,6 +1,7 @@
 FROM node:18-alpine
 WORKDIR /app
 COPY package.json ./
+COPY frontend/ ./frontend/
 COPY src/ ./src/
 COPY tests/ ./tests/
 EXPOSE 6379

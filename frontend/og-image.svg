@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+    <defs>
+        <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0E1726"/>
+            <stop offset="50%" stop-color="#1E293B"/>
+            <stop offset="100%" stop-color="#0F172A"/>
+        </linearGradient>
+        <linearGradient id="dbTop" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#38BDF8"/>
+            <stop offset="100%" stop-color="#0284C7"/>
+        </linearGradient>
+        <linearGradient id="dbBody" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0284C7"/>
+            <stop offset="100%" stop-color="#0369A1"/>
+        </linearGradient>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#0284C7" flood-opacity="0.4"/>
+        </filter>
+    </defs>
+
+    <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+    <g stroke="rgba(255,255,255,0.04)" stroke-width="1">
+        <line x1="100" y1="0" x2="100" y2="630"/>
+        <line x1="300" y1="0" x2="300" y2="630"/>
+        <line x1="600" y1="0" x2="600" y2="630"/>
+        <line x1="900" y1="0" x2="900" y2="630"/>
+        <line x1="1100" y1="0" x2="1100" y2="630"/>
+        <line x1="0" y1="150" x2="1200" y2="150"/>
+        <line x1="0" y1="315" x2="1200" y2="315"/>
+        <line x1="0" y1="480" x2="1200" y2="480"/>
+    </g>
+
+    <g transform="translate(100, 160)" filter="url(#glow)">
+        
+        <path d="M 0 140 v 60 c 0 35 75 60 160 60 s 160 -25 160 -60 v -60" fill="url(#dbBody)" opacity="0.9"/>
+        <ellipse cx="160" cy="140" rx="160" ry="50" fill="url(#dbTop)" stroke="#38BDF8" stroke-width="4"/>
+
+        <path d="M 0 70 v 60 c 0 35 75 60 160 60 s 160 -25 160 -60 v -60" fill="url(#dbBody)" opacity="0.9"/>
+        <ellipse cx="160" cy="70" rx="160" ry="50" fill="url(#dbTop)" stroke="#38BDF8" stroke-width="4"/>
+
+        <path d="M 0 0 v 60 c 0 35 75 60 160 60 s 160 -25 160 -60 v -60" fill="url(#dbBody)"/>
+        <ellipse cx="160" cy="0" rx="160" ry="50" fill="url(#dbTop)" stroke="#FFFFFF" stroke-width="6"/>
+        <ellipse cx="160" cy="0" rx="110" ry="32" fill="#FFFFFF" fill-opacity="0.3"/>
+
+        <circle cx="280" cy="-25" r="14" fill="#3CE0AD" stroke="#FFFFFF" stroke-width="4"/>
+    </g>
+
+    <text x="490" y="210" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="64" font-weight="900" fill="#FFFFFF" letter-spacing="-1">RediForge</text>
+    <text x="490" y="260" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="700" fill="#38BDF8" letter-spacing="0.5">High-Performance Redis-Compatible In-Memory Datastore</text>
+    
+    <text x="490" y="320" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" fill="#94A3B8" width="600">
+        <tspan x="490" dy="0">100% RESP2 wire compatibility, zero external runtime dependencies,</tspan>
+        <tspan x="490" dy="28">dual persistence (RDB + AOF), and real-time WebSocket telemetry.</tspan>
+    </text>
+
+    <g transform="translate(490, 390)">
+        
+        <rect x="0" y="0" width="170" height="38" rx="8" fill="rgba(56, 189, 248, 0.15)" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1.5"/>
+        <text x="85" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="700" fill="#38BDF8" text-anchor="middle">ZERO DEPENDENCY</text>
+
+        <rect x="185" y="0" width="160" height="38" rx="8" fill="rgba(60, 224, 173, 0.15)" stroke="rgba(60, 224, 173, 0.4)" stroke-width="1.5"/>
+        <text x="265" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="700" fill="#3CE0AD" text-anchor="middle">100% RESP2 WIRE</text>
+
+        <rect x="360" y="0" width="170" height="38" rx="8" fill="rgba(168, 85, 247, 0.15)" stroke="rgba(168, 85, 247, 0.4)" stroke-width="1.5"/>
+        <text x="445" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="700" fill="#C084FC" text-anchor="middle">16 ISOLATED DBS</text>
+    </g>
+
+    <line x1="100" y1="520" x2="1100" y2="520" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+    <text x="100" y="565" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" font-weight="700" fill="#F8FAFC">Engineered by Ashutosh Yadav</text>
+    <text x="100" y="590" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" fill="#64748B">ashutosh4tech@gmail.com • ashutoshwork.space</text>
+    <text x="1100" y="575" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="800" fill="#38BDF8" text-anchor="end">rediforge.in</text>
+</svg>

@@ -3,11 +3,183 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>RediForge - Main Dashboard</title>
+    <title>RediForge — High-Performance Redis-Compatible In-Memory Datastore & Real-Time Engine</title>
+
+    <meta name="description" content="RediForge is an enterprise-grade, high-performance Redis-compatible in-memory datastore with zero external runtime dependencies, 100% RESP2 wire compatibility, real-time WebSocket telemetry, dual persistence (RDB + AOF), and multi-database RBAC support. Engineered by Ashutosh Yadav."/>
+    <meta name="keywords" content="RediForge, Redis, Redis alternative, in-memory datastore, RESP2 protocol, cache, real-time database, Node.js Redis, Ashutosh Yadav, key-value store, high performance cache, RDB, AOF"/>
+    <meta name="author" content="Ashutosh Yadav"/>
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+    <link rel="canonical" href="https://rediforge.in/"/>
+
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https://rediforge.in/"/>
+    <meta property="og:title" content="RediForge — High-Performance Redis-Compatible In-Memory Datastore"/>
+    <meta property="og:description" content="Zero-dependency, 100% RESP2 wire-compatible in-memory datastore with dual persistence (RDB + AOF), live WebSocket telemetry, and multi-database RBAC. Built by Ashutosh Yadav."/>
+    <meta property="og:image" content="https://rediforge.in/og-image.svg"/>
+    <meta property="og:image:width" content="1200"/>
+    <meta property="og:image:height" content="630"/>
+    <meta property="og:image:alt" content="RediForge In-Memory Datastore Architecture and Dashboard"/>
+    <meta property="og:site_name" content="RediForge"/>
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:url" content="https://rediforge.in/"/>
+    <meta name="twitter:title" content="RediForge — High-Performance Redis-Compatible In-Memory Datastore"/>
+    <meta name="twitter:description" content="Zero-dependency, 100% RESP2 wire-compatible in-memory datastore with dual persistence (RDB + AOF), live WebSocket telemetry, and multi-database RBAC. Built by Ashutosh Yadav."/>
+    <meta name="twitter:image" content="https://rediforge.in/og-image.svg"/>
+    <meta name="twitter:creator" content="@ashutoshyadav"/>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <link rel="apple-touch-icon" href="/favicon.svg"/>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://rediforge.in/#organization",
+          "name": "RediForge",
+          "url": "https://rediforge.in",
+          "logo": "https://rediforge.in/favicon.svg",
+          "image": "https://rediforge.in/og-image.svg",
+          "description": "High-performance, zero-dependency in-memory Redis-compatible datastore engineered for sub-millisecond data caching, real-time messaging, and multi-database isolation.",
+          "founder": {
+            "@type": "Person",
+            "@id": "https://rediforge.in/#author",
+            "name": "Ashutosh Yadav",
+            "jobTitle": "Lead Systems Architect & Software Engineer",
+            "url": "https://ashutoshwork.space/",
+            "email": "ashutosh4tech@gmail.com",
+            "sameAs": [
+              "https://www.linkedin.com/in/ashutoshyadav256",
+              "https://github.com/Ashutosh-Yadav-256"
+            ]
+          },
+          "knowsAbout": [
+            "Redis RESP2 Wire Protocol",
+            "In-Memory Datastores",
+            "Real-Time WebSocket Telemetry",
+            "RDB Binary Snapshotting",
+            "AOF Write-Ahead Logging",
+            "Probabilistic Expiration Cron",
+            "Role-Based Access Control"
+          ],
+          "sameAs": [
+            "https://github.com/Ashutosh-Yadav-256/RediForge",
+            "https://www.linkedin.com/in/ashutoshyadav256"
+          ]
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://rediforge.in/#software",
+          "name": "RediForge",
+          "applicationCategory": "DatabaseApplication",
+          "applicationSubCategory": "In-Memory Key-Value Datastore & Cache",
+          "operatingSystem": "Cross-platform (Linux, Windows, macOS, Docker)",
+          "softwareVersion": "2.4.0",
+          "description": "Enterprise-grade, high-performance Redis-compatible in-memory datastore with zero runtime dependencies, 100% RESP2 wire compatibility, and real-time WebSocket telemetry.",
+          "url": "https://rediforge.in",
+          "screenshot": "https://rediforge.in/og-image.svg",
+          "featureList": [
+            "100% RESP2 Wire Protocol Compatibility",
+            "16 Isolated Logical Databases (db0 through db15)",
+            "Dual Persistence Subsystem (RDB Snapshots + AOF Write-Ahead Log)",
+            "Real-Time WebSocket Telemetry & Visual Dashboard",
+            "In-Browser Interactive RESP CLI Terminal",
+            "Multi-Tenant Role-Based Access Control (RBAC)",
+            "Dangerous Command Confirmation Safeguards (FLUSHALL/FLUSHDB)",
+            "Zero External Runtime Dependencies"
+          ],
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "author": {
+            "@id": "https://rediforge.in/#author"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://rediforge.in/#website",
+          "url": "https://rediforge.in",
+          "name": "RediForge",
+          "description": "Official portal and management console for RediForge in-memory datastore.",
+          "publisher": {
+            "@id": "https://rediforge.in/#organization"
+          }
+        },
+        {
+          "@type": "TechArticle",
+          "@id": "https://rediforge.in/architecture#article",
+          "headline": "RediForge System Architecture, Internal Subsystems & Engineering Whitepaper",
+          "description": "Comprehensive architectural analysis of RediForge: zero-copy RESP2 parser, memory accounting, probabilistic active expiry, and dual-phase eviction subsystems.",
+          "url": "https://rediforge.in/architecture",
+          "author": {
+            "@id": "https://rediforge.in/#author"
+          },
+          "publisher": {
+            "@id": "https://rediforge.in/#organization"
+          },
+          "datePublished": "2026-09-14",
+          "inLanguage": "en"
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://rediforge.in/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is RediForge and how is it compatible with Redis?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "RediForge is an enterprise-grade, memory-first key-value database engineered from first principles in Node.js with zero external runtime dependencies. It provides 100% RESP2 wire compatibility, allowing standard Redis clients such as redis-py, ioredis, Jedis, and redis-cli to connect seamlessly over TCP port 6379 or WebSockets."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How do I connect external Python or Node.js applications to RediForge?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "RediForge is 100% RESP2 wire-compatible. You can connect using any standard Redis client library (e.g. redis-py on host rediforge.in port 6379, or ioredis on redis://rediforge.in:6379/0) or directly through secure WebSockets at wss://rediforge.in."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How many isolated databases does RediForge support?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "RediForge supports 16 independent logical databases (db0 through db15). Each database maintains an isolated keyspace, independent TTL tracking, and atomic execution contexts accessible via the SELECT command."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What persistence mechanisms does RediForge offer?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "RediForge provides dual persistence: compact point-in-time binary RDB snapshots (dump.rdb) and Append-Only File (appendonly.aof) write-ahead transaction logging with configurable fsync policies (always, everysec, no) to prevent data loss."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does RediForge prevent accidental data loss and dangerous command execution?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "RediForge implements CommandGateway security guards that intercept destructive operations such as FLUSHALL and FLUSHDB, requiring explicit confirmation and administrative RBAC privileges before execution."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="/style.css" />
     <script>
         tailwind.config = {
             theme: {
@@ -22,30 +194,66 @@
         }
     </script>
 </head>
-<body class="antialiased min-h-screen overflow-x-hidden flex flex-col redisgen-container">
+<body class="antialiased min-h-screen overflow-x-hidden flex flex-col rediforge-container bg-[#E8EBF2] text-[#2A2F33]">
 
-    <!-- TopNavBar Component -->
-    <header class="fixed top-0 left-0 w-full z-40 flex justify-between items-center px-8 py-4 bg-[#E8EBF2] shadow-[0_4px_10px_rgba(196,201,212,0.5)] border-b border-white/50" id="tour-header">
-        <div class="flex items-center gap-6">
-            <div class="text-2xl font-bold text-[#2A2F33] tracking-tighter flex items-center gap-2">
-                <span class="material-symbols-outlined text-accent-blue" style="font-size: 28px;">database</span>
+    <noscript>
+        <div class="p-8 max-w-4xl mx-auto bg-white text-slate-800 rounded-xl my-4 shadow">
+            <h1 class="text-3xl font-bold mb-2 text-slate-900">RediForge — High-Performance Redis-Compatible In-Memory Datastore</h1>
+            <p class="text-base text-slate-600 mb-6">
+                <strong>RediForge</strong> is an enterprise-grade, memory-first key-value database engineered from first principles with zero external runtime dependencies and 100% RESP2 wire compatibility. Built by <a href="https://ashutoshwork.space/" class="text-blue-600 font-bold underline">Ashutosh Yadav</a>.
+            </p>
+            <h2 class="text-xl font-bold mb-3 text-slate-800">Key Features & Architecture</h2>
+            <ul class="list-disc pl-6 space-y-2 mb-6 text-sm text-slate-700">
+                <li><strong>100% RESP2 Protocol Compliance:</strong> Connect using redis-py, ioredis, Jedis, or standard redis-cli on TCP port 6379.</li>
+                <li><strong>Multi-Database Isolation:</strong> 16 independent logical databases (db0 through db15).</li>
+                <li><strong>Dual Persistence Subsystem:</strong> Binary RDB point-in-time snapshots and Append-Only File (AOF) write-ahead logging.</li>
+                <li><strong>Integrated Observability:</strong> Real-time WebSocket telemetry, memory usage visualizer, key browser, and in-browser RESP terminal.</li>
+                <li><strong>Enterprise Security:</strong> SSRF protection, dangerous command guards (FLUSHALL/FLUSHDB), and multi-tenant Role-Based Access Control (RBAC).</li>
+            </ul>
+            <h2 class="text-xl font-bold mb-3 text-slate-800">Developer & Author Contact</h2>
+            <p class="text-sm text-slate-600">
+                Lead Architect: <strong>Ashutosh Yadav</strong> • Email: <a href="mailto:ashutosh4tech@gmail.com" class="text-blue-600 underline">ashutosh4tech@gmail.com</a> • Portfolio: <a href="https://ashutoshwork.space/" class="text-blue-600 underline">ashutoshwork.space</a> • LinkedIn: <a href="https://www.linkedin.com/in/ashutoshyadav256" class="text-blue-600 underline">linkedin.com/in/ashutoshyadav256</a>
+            </p>
+        </div>
+    </noscript>
+
+    <div id="offline-banner" class="hidden" style="display: none;">
+        <span class="material-symbols-outlined text-[18px]">wifi_off</span>
+        <span>Network connection lost. You are currently offline.</span>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <header class="fixed top-0 left-0 w-full z-40 flex justify-between items-center px-3 sm:px-6 md:px-8 py-2.5 sm:py-4 bg-[#E8EBF2] shadow-[0_4px_10px_rgba(196,201,212,0.5)] border-b border-white/50" id="tour-header">
+        <div class="flex items-center gap-3 sm:gap-6">
+            <div class="text-xl sm:text-2xl font-bold text-[#2A2F33] tracking-tighter flex items-center gap-1.5 sm:gap-2 cursor-pointer" id="brand-logo">
+                <span class="material-symbols-outlined text-accent-blue text-[24px] sm:text-[28px]">database</span>
                 RediForge
             </div>
             <span id='connection-status' class='hidden'></span>
             <nav class="hidden md:flex gap-4">
-                <a id="nav-dashboard" class="text-accent-blue font-semibold border-b-2 border-accent-blue pb-1 transition-colors cursor-pointer">Dashboard</a>
-                <a id="nav-browser" class="text-[#7E8490] hover:text-accent-blue transition-colors font-medium cursor-pointer">Browser</a>
-                <a id="nav-cli" class="text-[#7E8490] hover:text-accent-blue transition-colors font-medium cursor-pointer">CLI</a>
-                <a id="nav-settings" class="text-[#7E8490] hover:text-accent-blue transition-colors font-medium cursor-pointer">Settings</a>
+                <a id="nav-dashboard" href="/dashboard" class="text-accent-blue font-semibold border-b-2 border-accent-blue pb-1 transition-colors cursor-pointer">Dashboard</a>
+                <a id="nav-browser" href="/browser" class="text-[#7E8490] hover:text-accent-blue transition-colors font-medium cursor-pointer">Browser</a>
+                <a id="nav-cli" href="/cli" class="text-[#7E8490] hover:text-accent-blue transition-colors font-medium cursor-pointer">CLI</a>
+                <a id="nav-help" href="/help" class="text-[#7E8490] hover:text-accent-blue transition-colors font-medium cursor-pointer flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px]">help_center</span> Help
+                </a>
+                <a id="nav-arch" href="/architecture" class="text-[#7E8490] hover:text-accent-blue transition-colors font-medium cursor-pointer flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px]">account_tree</span> Architecture
+                </a>
+                <a id="nav-settings" href="/settings" class="text-[#7E8490] hover:text-accent-blue transition-colors font-medium cursor-pointer">Settings</a>
             </nav>
         </div>
-        <div class="flex items-center gap-4">
-            <button id="btn-help" class="neo-button p-2 text-accent-blue rounded-full flex items-center justify-center">
-                <span class="material-symbols-outlined">help</span>
+        <div class="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
+            <button id="btn-arch-header" title="System Architecture & Whitepaper" class="neo-button p-1.5 sm:p-2 text-accent-blue rounded-full hidden sm:flex items-center justify-center">
+                <span class="material-symbols-outlined text-[18px] sm:text-[20px]">account_tree</span>
             </button>
-            <div class="neo-button px-2 py-1 flex items-center gap-1" id="tour-db-select">
-                <span class="material-symbols-outlined text-accent-green text-[18px]">dns</span>
-                <select id="db-select" class="bg-transparent font-mono text-sm font-bold text-[#2A2F33] outline-none cursor-pointer border-none p-0 focus:ring-0">
+            <button id="btn-help" title="Interactive Tour" class="neo-button p-1.5 sm:p-2 text-accent-blue rounded-full hidden sm:flex items-center justify-center">
+                <span class="material-symbols-outlined text-[18px] sm:text-[20px]">explore</span>
+            </button>
+            <div class="neo-button px-1.5 sm:px-2 py-1 flex items-center gap-1" id="tour-db-select">
+                <span class="material-symbols-outlined text-accent-green text-[16px] sm:text-[18px]">dns</span>
+                <select id="db-select" class="bg-transparent font-mono text-xs sm:text-sm font-bold text-[#2A2F33] outline-none cursor-pointer border-none p-0 focus:ring-0">
                     <option value="0">db0</option>
                     <option value="1">db1</option>
                     <option value="2">db2</option>
@@ -64,100 +272,144 @@
                     <option value="15">db15</option>
                 </select>
             </div>
-            <button id='btn-disconnect' class="neo-button px-4 py-2 text-accent-red">
-                Disconnect
+
+            <div class="relative">
+                <button id="btn-user-avatar" class="neo-button p-1 sm:p-1.5 rounded-full flex items-center gap-1 text-xs font-bold text-[#2A2F33]">
+                    <span class="material-symbols-outlined text-[18px] sm:text-[20px] text-accent-blue">account_circle</span>
+                    <span id="user-display-name" class="hidden sm:inline pr-1">Account</span>
+                </button>
+                <div id="user-menu-dropdown" class="hidden absolute right-0 mt-2 w-48 sm:w-52 max-w-[calc(100vw-1.5rem)] bg-[#E8EBF2] neo-card p-2 z-50 flex flex-col gap-1 border border-white/60 shadow-xl">
+                    <div class="p-2 border-b border-[#C4C9D4]/40">
+                        <div id="dropdown-user-email" class="text-xs font-bold truncate text-[#2A2F33] max-w-[180px]">ashutosh4tech@gmail.com</div>
+                        <div id="dropdown-user-role" class="text-[10px] font-mono text-accent-blue font-semibold uppercase">Role: Administrator</div>
+                    </div>
+                    <button id="menu-btn-settings" class="text-left px-3 py-1.5 text-xs font-semibold rounded hover:bg-white/50 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">manage_accounts</span> Account Settings
+                    </button>
+                    <button id="menu-btn-api-keys" class="text-left px-3 py-1.5 text-xs font-semibold rounded hover:bg-white/50 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">key</span> API Bearer Keys
+                    </button>
+                    <div class="border-t border-[#C4C9D4]/40 my-1"></div>
+                    <button id="menu-btn-logout" class="text-left px-3 py-1.5 text-xs font-semibold text-accent-red rounded hover:bg-white/50 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">logout</span> Disconnect Session
+                    </button>
+                </div>
+            </div>
+
+            <button id='btn-disconnect' class="neo-button px-2 sm:px-3 py-1.5 sm:py-2 text-accent-red text-xs sm:text-sm flex items-center gap-1 font-semibold" title="Disconnect Session">
+                <span class="material-symbols-outlined text-[18px] sm:hidden">power_settings_new</span>
+                <span class="hidden sm:inline">Disconnect</span>
             </button>
         </div>
     </header>
 
-    <!-- Main Content Area -->
-    <div id="app" class="hidden flex-grow pt-[100px] px-8 pb-8">
-        
-        <!-- Server Stats Row -->
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="tour-stats">
-            <div class="neo-card p-4 flex flex-col gap-2">
-                <div class="flex justify-between items-center pb-2 mb-2">
-                    <span class="text-sm font-semibold text-[#7E8490] uppercase tracking-wider">Memory Usage</span>
+    <main id="app" class="hidden flex-grow pt-[72px] sm:pt-[96px] px-3 sm:px-6 md:px-8 pb-20 md:pb-8 flex flex-col">
+
+        <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8" id="tour-stats">
+            <div class="neo-card p-3 sm:p-4 flex flex-col gap-1.5 sm:gap-2">
+                <div class="flex justify-between items-center pb-1 mb-1">
+                    <span class="text-xs sm:text-sm font-semibold text-[#7E8490] uppercase tracking-wider">Memory</span>
                     <div class="skill-indicator indicator-blue"></div>
                 </div>
-                <div id="stat-memory" class="text-3xl font-bold text-[#2A2F33]">1.2GB</div>
+                <div id="stat-memory" class="text-2xl sm:text-3xl font-bold text-[#2A2F33]">--</div>
                 <div class="flex items-center gap-2 mt-auto">
                     <div class="flex-grow h-2 neo-inset rounded-full overflow-hidden p-[1px]">
-                        <div class="h-full bg-accent-blue w-[30%] rounded-full shadow-[0_0_5px_rgba(24,133,226,0.5)]"></div>
+                        <div id="stat-mem-bar" class="h-full bg-accent-blue w-[0%] rounded-full shadow-[0_0_5px_rgba(24,133,226,0.5)] transition-all duration-500"></div>
                     </div>
-                    <span class="text-xs font-bold text-[#7E8490]">/ 4GB</span>
+                    <span id="stat-mem-total" class="text-[11px] sm:text-xs font-bold text-[#7E8490]">RSS</span>
                 </div>
             </div>
 
-            <div class="neo-card p-4 flex flex-col gap-2">
-                <div class="flex justify-between items-center pb-2 mb-2">
-                    <span class="text-sm font-semibold text-[#7E8490] uppercase tracking-wider">Connected Clients</span>
+            <div class="neo-card p-3 sm:p-4 flex flex-col gap-1.5 sm:gap-2">
+                <div class="flex justify-between items-center pb-1 mb-1">
+                    <span class="text-xs sm:text-sm font-semibold text-[#7E8490] uppercase tracking-wider">Clients</span>
                     <div class="skill-indicator indicator-green"></div>
                 </div>
-                <div id="stat-clients" class="text-3xl font-bold text-[#2A2F33]">124</div>
-                <div class="text-sm font-semibold text-accent-green mt-auto flex items-center gap-2">
+                <div id="stat-clients" class="text-2xl sm:text-3xl font-bold text-[#2A2F33]">0</div>
+                <div class="text-xs sm:text-sm font-semibold text-accent-green mt-auto flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-accent-green animate-pulse"></span>
-                    Live Connections
+                    Live Clients
                 </div>
             </div>
 
-            <div class="neo-card p-4 flex flex-col gap-2">
-                <div class="flex justify-between items-center pb-2 mb-2">
-                    <span class="text-sm font-semibold text-[#7E8490] uppercase tracking-wider">Total Keys</span>
+            <div class="neo-card p-3 sm:p-4 flex flex-col gap-1.5 sm:gap-2">
+                <div class="flex justify-between items-center pb-1 mb-1">
+                    <span class="text-xs sm:text-sm font-semibold text-[#7E8490] uppercase tracking-wider">Total Keys</span>
                     <div class="skill-indicator" style="background-color: #F5A623;"></div>
                 </div>
-                <div id="stat-keys" class="text-3xl font-bold text-[#2A2F33]">45.2k</div>
-                <div class="text-sm font-semibold text-[#7E8490] mt-auto">
-                    +1.2k since yesterday
+                <div id="stat-keys" class="text-2xl sm:text-3xl font-bold text-[#2A2F33]">0</div>
+                <div id="stat-keys-sub" class="text-xs sm:text-sm font-semibold text-[#7E8490] mt-auto">
+                    in current db
                 </div>
             </div>
 
-            <div class="neo-card p-4 flex flex-col gap-2">
-                <div class="flex justify-between items-center pb-2 mb-2">
-                    <span class="text-sm font-semibold text-[#7E8490] uppercase tracking-wider">Node Status</span>
+            <div class="neo-card p-3 sm:p-4 flex flex-col gap-1.5 sm:gap-2">
+                <div class="flex justify-between items-center pb-1 mb-1">
+                    <span class="text-xs sm:text-sm font-semibold text-[#7E8490] uppercase tracking-wider">Node Status</span>
                     <div class="skill-indicator indicator-red"></div>
                 </div>
-                <div id="stat-node" class="text-2xl font-bold text-[#2A2F33]">Master-01</div>
-                <div class="text-xs font-mono font-bold text-[#7E8490] mt-auto neo-inset px-2 py-1 rounded inline-block w-max">
-                    Uptime: <span id="stats-uptime">42d 18h</span>
+                <div id="stat-node" class="text-xl sm:text-2xl font-bold text-[#2A2F33] truncate">RediForge</div>
+                <div class="text-[11px] sm:text-xs font-mono font-bold text-[#7E8490] mt-auto neo-inset px-2 py-0.5 sm:py-1 rounded inline-block w-max">
+                    Uptime: <span id="stats-uptime">0s</span>
                 </div>
             </div>
         </section>
 
-        <!-- Two Column Layout: Chart & Browser/Terminal -->
-        <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 h-[700px]">
-            
-            <!-- Left Column: Memory Chart & Terminal -->
-            <div class="lg:col-span-8 flex flex-col gap-8 h-full">
-                
-                <!-- Memory History Chart -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 min-h-0 lg:min-h-[700px] mb-8 sm:mb-12">
+
+            <div class="lg:col-span-8 flex flex-col gap-4 sm:gap-8 h-full">
+
                 <div class="neo-card flex-grow flex flex-col relative overflow-hidden" id="tour-chart">
                     <div class="p-6 pb-2 flex justify-between items-center z-10">
                         <h2 class="text-xl font-bold text-[#2A2F33] flex items-center gap-2">
                             <span class="material-symbols-outlined text-accent-blue">show_chart</span>
                             Memory History
                         </h2>
-                        <div class="flex gap-2">
-                            <button class="neo-button px-3 py-1 text-xs">1H</button>
-                            <button class="neo-button neo-button-pressed text-accent-blue px-3 py-1 text-xs">24H</button>
-                            <button class="neo-button px-3 py-1 text-xs">7D</button>
+                        <div class="flex items-center gap-4">
+                            <div class="hidden sm:flex items-center gap-3 text-xs font-mono">
+                                <span class="flex items-center gap-1.5 text-accent-blue font-semibold">
+                                    <span class="w-2 h-2 rounded-full bg-accent-blue animate-pulse"></span>
+                                    Current: <strong id="chart-current-mem" class="font-bold">--</strong>
+                                </span>
+                                <span class="text-[#7E8490]">Peak: <strong id="chart-peak-mem" class="font-bold">--</strong></span>
+                            </div>
+                            <span class="neo-button neo-button-pressed text-accent-blue px-3 py-1 text-xs font-semibold">Live (1s)</span>
                         </div>
                     </div>
                     
-                    <div class="relative flex-grow mt-4 p-4 z-0">
-                        <canvas id="memory-chart" class="absolute inset-4"></canvas>
-                        <!-- SVG Fallback -->
-                        <svg style="display:none;" class="absolute inset-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)]" preserveAspectRatio="none" viewBox="0 0 100 100">
-                            <line stroke="rgba(0,0,0,0.05)" stroke-width="0.5" x1="0" x2="100" y1="25" y2="25"></line>
-                            <line stroke="rgba(0,0,0,0.05)" stroke-width="0.5" x1="0" x2="100" y1="50" y2="50"></line>
-                            <line stroke="rgba(0,0,0,0.05)" stroke-width="0.5" x1="0" x2="100" y1="75" y2="75"></line>
-                            <path d="M0,80 Q10,75 20,60 T40,50 T60,65 T80,30 T100,25" fill="none" stroke="#1885E2" stroke-width="1.5"></path>
-                            <circle cx="100" cy="25" fill="#1885E2" r="2"></circle>
-                        </svg>
+                    <div class="relative flex-grow p-4 pt-1 z-0 flex flex-col justify-between" id="chart-container">
+                        <div class="relative w-full flex-grow min-h-[160px] neo-inset p-3 rounded-xl overflow-hidden flex flex-col justify-between">
+                            <div class="absolute inset-0 p-3 pointer-events-none flex flex-col justify-between text-[10px] font-mono text-[#7E8490]/70 z-0 select-none">
+                                <div class="flex justify-between border-b border-[#C4C9D4]/20 pb-0.5"><span id="scale-max">--</span><span>Peak</span></div>
+                                <div class="flex justify-between border-b border-[#C4C9D4]/20 pb-0.5"><span id="scale-mid">--</span><span>50%</span></div>
+                                <div class="flex justify-between"><span id="scale-min">0 B</span><span>0%</span></div>
+                            </div>
+
+                            <svg id="memory-svg-chart" class="w-full h-full relative z-10 overflow-visible" viewBox="0 0 500 140" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="memGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stop-color="#1885E2" stop-opacity="0.35"></stop>
+                                        <stop offset="100%" stop-color="#1885E2" stop-opacity="0.0"></stop>
+                                    </linearGradient>
+                                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#1885E2" flood-opacity="0.35"/>
+                                    </filter>
+                                </defs>
+                                <path id="mem-area-path" d="" fill="url(#memGradient)"></path>
+                                <path id="mem-line-path" d="" fill="none" stroke="#1885E2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"></path>
+                                <circle id="mem-latest-point" cx="-10" cy="-10" r="4" fill="#1885E2" stroke="#FFFFFF" stroke-width="2"></circle>
+                            </svg>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px] font-mono text-[#7E8490] mt-2 px-1">
+                            <span>T-60s</span>
+                            <span class="text-accent-blue font-medium flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">sensors</span> Real-time telemetry
+                            </span>
+                            <span>Now</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Interactive Terminal -->
                 <div class="neo-card h-[300px] flex flex-col" id="tour-terminal">
                     <div class="px-4 py-2 flex items-center justify-between border-b border-[#C4C9D4]/30">
                         <div class="flex gap-2">
@@ -165,84 +417,989 @@
                             <div class="w-3 h-3 rounded-full bg-[#F5A623]"></div>
                             <div class="w-3 h-3 rounded-full bg-accent-green"></div>
                         </div>
-                        <span class="font-mono text-xs font-bold text-[#7E8490] tracking-wider">REDIS CLI - Local:6379</span>
+                        <span id="cli-server-label" class="font-mono text-xs font-bold text-[#7E8490] tracking-wider">REDIS CLI - Connected</span>
                         <button id="btn-clear-terminal" class="text-xs font-bold text-accent-blue hover:text-[#2A2F33] transition-colors">Clear</button>
                     </div>
                     
                     <div class="neo-inset flex-grow m-2 p-3 overflow-y-auto font-mono text-sm flex flex-col gap-1 bg-white/50" id="terminal-output">
-                        <div class="text-[#7E8490]">redis-cli 7.0.12</div>
-                        <div class="text-[#7E8490]">Connected to 127.0.0.1:6379</div>
-                        <div><span class="text-accent-blue font-bold">127.0.0.1:6379></span> PING</div>
-                        <div class="text-accent-green font-bold">PONG</div>
-                        <div><span class="text-accent-blue font-bold">127.0.0.1:6379></span> INFO MEMORY</div>
-                        <div class="text-[#7E8490] opacity-80 leading-snug">
-                            # Memory<br/>
-                            used_memory:1245678<br/>
-                            used_memory_human:1.19G
-                        </div>
+                        <div class="text-[#7E8490]">RediForge Web CLI v1.0.0</div>
+                        <div class="text-[#7E8490]">Type any Redis command (e.g. PING, SET key value, GET key, KEYS *)...</div>
                     </div>
                     
                     <div class="px-4 pb-3 flex items-center gap-2 font-mono">
-                        <span class="text-accent-blue font-bold">redis-gen></span>
+                        <span id="terminal-prompt" class="text-accent-blue font-bold">rediforge></span>
                         <input type="text" id="terminal-input" class="neo-inset px-2 py-1 flex-grow font-mono text-sm" placeholder="Type a command (e.g. GET key)..." spellcheck="false" autocomplete="off"/>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Key Browser -->
             <div class="lg:col-span-4 neo-card flex flex-col overflow-hidden h-full" id="tour-browser">
-                <div class="p-4 flex justify-between items-center border-b border-[#C4C9D4]/30">
-                    <h2 class="text-lg font-bold text-[#2A2F33] flex items-center gap-2">
-                        <span class="material-symbols-outlined text-accent-blue">manage_search</span>
+                <div class="p-3 sm:p-4 flex flex-wrap gap-2 justify-between items-center border-b border-[#C4C9D4]/30">
+                    <h2 class="text-base sm:text-lg font-bold text-[#2A2F33] flex items-center gap-1.5 sm:gap-2">
+                        <span class="material-symbols-outlined text-accent-blue text-[20px] sm:text-[24px]">manage_search</span>
                         Key Browser
                     </h2>
-                    <button id="btn-refresh-keys" class="neo-button p-1 text-accent-blue flex items-center justify-center">
-                        <span class="material-symbols-outlined text-sm">refresh</span>
-                    </button>
-                </div>
-                
-                <div class="p-4">
-                    <div class="relative">
-                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#7E8490] text-[18px]">search</span>
-                        <input id="key-filter" type="text" class="neo-inset w-full py-2 pl-10 pr-4 font-mono text-sm placeholder:text-[#7E8490]" placeholder="Search keys..."/>
+                    <div class="flex items-center gap-1.5 sm:gap-2">
+                        <button id="btn-add-key" class="neo-button px-2 sm:px-2.5 py-1 text-xs text-accent-blue flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[15px] sm:text-[16px]">add</span> New
+                        </button>
+                        <button id="btn-seed-keys" title="Seed Demo Dataset" class="neo-button px-2 sm:px-2.5 py-1 text-xs text-accent-green flex items-center gap-1 font-bold">
+                            <span class="material-symbols-outlined text-[15px] sm:text-[16px]">bolt</span> Seed
+                        </button>
+                        <button id="btn-refresh-keys" title="Refresh Keys" class="neo-button p-1 sm:p-1.5 text-accent-blue flex items-center justify-center">
+                            <span class="material-symbols-outlined text-xs sm:text-sm">refresh</span>
+                        </button>
                     </div>
                 </div>
                 
-                <div class="flex-grow overflow-y-auto px-2">
-                    <div id="key-list" class="flex flex-col gap-2 w-full"></div>
+                <div class="p-3 sm:p-4 pb-2">
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#7E8490] text-[18px]">search</span>
+                        <input id="key-filter" type="text" class="neo-inset w-full py-1.5 sm:py-2 pl-9 sm:pl-10 pr-4 font-mono text-xs sm:text-sm placeholder:text-[#7E8490]" placeholder="Search keys (e.g. user:*)..."/>
+                    </div>
                 </div>
                 
-                <!-- Detail Panel (Value Viewer) -->
-                <div id="key-detail" class="h-[250px] neo-inset m-2 p-4 flex flex-col hidden bg-white/50 border border-white/50">
+                <div class="flex-grow overflow-y-auto p-2 sm:p-3 max-h-[380px] lg:max-h-[460px]" id="key-list-container">
+                    <div id="key-list" class="flex flex-col w-full"></div>
+                </div>
+
+                <div id="key-detail" class="h-[250px] neo-inset m-2 p-3 sm:p-4 flex flex-col hidden bg-white/50 border border-white/50">
                     <div class="flex justify-between items-center mb-2">
-                        <div class="flex items-center gap-2">
-                            <span id="detail-key-name" class="font-mono font-bold text-accent-blue text-sm truncate max-w-[150px]"></span>
-                            <span id="detail-key-type" class="neo-badge text-[10px]"></span>
+                        <div class="flex items-center gap-1.5 sm:gap-2 overflow-hidden">
+                            <span id="detail-key-name" class="font-mono font-bold text-accent-blue text-xs sm:text-sm truncate max-w-[100px] sm:max-w-[150px]"></span>
+                            <span id="detail-key-type" class="detail-type-badge key-type-string text-[9px] sm:text-[10px]"></span>
+                            <span id="detail-key-ttl" class="text-[10px] font-mono text-[#7E8490]"></span>
                         </div>
-                        <div class="flex gap-2">
-                            <button class="text-[#7E8490] hover:text-accent-blue transition-colors"><span class="material-symbols-outlined text-[16px]">edit</span></button>
-                            <button class="text-[#7E8490] hover:text-accent-red transition-colors"><span class="material-symbols-outlined text-[16px]">delete</span></button>
-                            <button id="btn-close-detail" class="text-[#7E8490] hover:text-[#2A2F33] transition-colors ml-1"><span class="material-symbols-outlined text-[18px]">close</span></button>
+                        <div class="flex gap-1 items-center flex-shrink-0">
+                            <button id="btn-edit-key" title="Edit Value" class="neo-button p-1 text-[#7E8490] hover:text-accent-blue transition-colors"><span class="material-symbols-outlined text-[16px]">edit</span></button>
+                            <button id="btn-delete-key" title="Delete Key" class="neo-button p-1 text-[#7E8490] hover:text-accent-red transition-colors"><span class="material-symbols-outlined text-[16px]">delete</span></button>
+                            <button id="btn-close-detail" title="Close" class="neo-button p-1 text-[#7E8490] hover:text-[#2A2F33] transition-colors ml-1"><span class="material-symbols-outlined text-[18px]">close</span></button>
                         </div>
                     </div>
                     <div id="detail-content" class="bg-white/70 rounded p-2 flex-grow overflow-y-auto font-mono text-xs leading-relaxed whitespace-pre text-[#2A2F33] shadow-inner border border-[#C4C9D4]/30"></div>
                 </div>
             </div>
         </section>
-    </div>
 
-    <!-- Login Overlay -->
-    <div id="login-overlay" class="flex flex-col items-center justify-center absolute inset-0 bg-[#E8EBF2] z-50">
-        <div class="neo-card p-8 flex flex-col items-center max-w-sm w-full">
-            <span class="material-symbols-outlined text-accent-blue text-6xl mb-4">database</span>
-            <h1 class="text-3xl font-bold text-[#2A2F33] mb-6">RediForge</h1>
-            <input type="text" id="ws-url" value="wss://redisgen.onrender.com" class="neo-inset w-full p-3 mb-4 text-center font-mono text-[#2A2F33]" placeholder="Server URL">
-            <button id="btn-connect" class="neo-button neo-button-primary w-full p-3 text-lg">Connect</button>
-            <p id="login-error" class="text-accent-red mt-4 text-sm font-bold h-5"></p>
+        <footer class="mt-auto border-t border-[#C4C9D4]/40 pt-10 pb-6 text-sm text-[#7E8490]">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-10">
+                <div class="col-span-2 lg:col-span-1">
+                    <div class="text-xl font-bold text-[#2A2F33] flex items-center gap-2 mb-3">
+                        <span class="material-symbols-outlined text-accent-blue">database</span>
+                        RediForge
+                    </div>
+                    <p class="text-xs text-[#7E8490] leading-relaxed mb-4">
+                        A high-throughput, RESP2-compatible in-memory datastore with built-in RBAC, real-time telemetry, and visual admin suite.
+                    </p>
+                    <div class="flex items-center gap-2 text-xs font-semibold text-accent-green">
+                        <span class="w-2 h-2 rounded-full bg-accent-green animate-pulse"></span>
+                        <span>Systems Operational</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-[#2A2F33] uppercase text-xs tracking-wider mb-3">Product</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="/dashboard" class="footer-link hover:text-accent-blue">Console Dashboard</a></li>
+                        <li><a href="/browser" class="footer-link hover:text-accent-blue">Key Browser</a></li>
+                        <li><a href="/cli" class="footer-link hover:text-accent-blue">Web RESP CLI</a></li>
+                        <li><a href="/status" class="footer-link hover:text-accent-blue">System Health / Status</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-[#2A2F33] uppercase text-xs tracking-wider mb-3">Security & Legal</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="/privacy" class="footer-link hover:text-accent-blue">Privacy Policy</a></li>
+                        <li><a href="/terms" class="footer-link hover:text-accent-blue">Terms of Service</a></li>
+                        <li><a href="/security-policy" class="footer-link hover:text-accent-blue">Security Policy</a></li>
+                        <li><a href="/dpa" class="footer-link hover:text-accent-blue">Data Processing (DPA)</a></li>
+                        <li><a href="/aup" class="footer-link hover:text-accent-blue">Acceptable Use (AUP)</a></li>
+                        <li><a href="/responsible-disclosure" class="footer-link hover:text-accent-blue">Responsible Disclosure</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-[#2A2F33] uppercase text-xs tracking-wider mb-3">Trust & Compliance</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="/cookie-policy" class="footer-link hover:text-accent-blue">Cookie Policy</a></li>
+                        <li><a href="/cookie-preferences" class="footer-link hover:text-accent-blue">Cookie Preferences</a></li>
+                        <li><a href="/accessibility" class="footer-link hover:text-accent-blue">Accessibility Statement</a></li>
+                        <li><a href="/disclaimer" class="footer-link hover:text-accent-blue">Legal Disclaimer</a></li>
+                        <li><a href="/community" class="footer-link hover:text-accent-blue">Community Guidelines</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-[#2A2F33] uppercase text-xs tracking-wider mb-3">Developer & Docs</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="/architecture" class="footer-link hover:text-accent-blue font-bold flex items-center gap-1 text-accent-blue"><span class="material-symbols-outlined text-[14px] text-accent-blue">account_tree</span> Architecture & Technical Docs</a></li>
+                        <li><a href="https://ashutoshwork.space/" target="_blank" rel="noopener noreferrer" class="footer-link hover:text-accent-blue flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-accent-blue">language</span> Portfolio (ashutoshwork.space)</a></li>
+                        <li><a href="https://www.linkedin.com/in/ashutoshyadav256" target="_blank" rel="noopener noreferrer" class="footer-link hover:text-accent-blue flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-accent-blue">business_center</span> LinkedIn Profile</a></li>
+                        <li><a href="mailto:ashutosh4tech@gmail.com" class="footer-link hover:text-accent-blue flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-accent-blue">mail</span> ashutosh4tech@gmail.com</a></li>
+                        <li><a href="/help" class="footer-link hover:text-accent-blue">Help Center & FAQ</a></li>
+                        <li><a href="/support" class="footer-link hover:text-accent-blue">Submit Support Ticket</a></li>
+                        <li><a href="https://github.com/Ashutosh-Yadav-256/RediForge" target="_blank" rel="noopener noreferrer" class="footer-link hover:text-accent-blue flex items-center gap-1">GitHub Repo <span class="material-symbols-outlined text-[14px]">open_in_new</span></a></li>
+                    </ul>
+
+                </div>
+            </div>
+
+            <div class="border-t border-[#C4C9D4]/30 pt-4 flex flex-col sm:flex-row justify-between items-center text-xs text-[#7E8490] gap-2">
+                <div>
+                    © 2026 RediForge. Built by <a href="https://ashutoshwork.space/" target="_blank" rel="noopener noreferrer" class="font-bold text-[#2A2F33] hover:text-accent-blue underline">Ashutosh Yadav</a> (<a href="mailto:ashutosh4tech@gmail.com" class="hover:underline">ashutosh4tech@gmail.com</a>).
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="https://ashutoshwork.space/" target="_blank" rel="noopener noreferrer" class="hover:text-accent-blue font-semibold">Portfolio</a>
+                    <a href="https://www.linkedin.com/in/ashutoshyadav256" target="_blank" rel="noopener noreferrer" class="hover:text-accent-blue font-semibold">LinkedIn</a>
+                    <a href="mailto:ashutosh4tech@gmail.com" class="hover:text-accent-blue font-semibold">Email</a>
+                    <a href="/privacy" class="hover:text-accent-blue">Privacy</a>
+                    <a href="/terms" class="hover:text-accent-blue">Terms</a>
+                    <a href="/cookie-preferences" class="hover:text-accent-blue">Cookies</a>
+                </div>
+            </div>
+        </footer>
+
+        <nav id="mobile-bottom-nav" class="fixed bottom-0 left-0 right-0 z-40 bg-[#E8EBF2]/95 backdrop-blur-md border-t border-white/60 shadow-[0_-4px_16px_rgba(196,201,212,0.6)] md:hidden py-1.5 px-3 flex justify-around items-center" aria-label="Mobile Bottom Navigation">
+            <button id="nav-mobile-dashboard" class="mobile-nav-item neo-button neo-button-pressed flex flex-col items-center justify-center py-1.5 px-2.5 text-accent-blue rounded-xl text-[10px] font-bold min-w-[56px] transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-[20px]">dashboard</span>
+                <span class="mt-0.5">Console</span>
+            </button>
+            <button id="nav-mobile-browser" class="mobile-nav-item neo-button flex flex-col items-center justify-center py-1.5 px-2.5 text-[#7E8490] rounded-xl text-[10px] font-semibold min-w-[56px] transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-[20px]">manage_search</span>
+                <span class="mt-0.5">Keys</span>
+            </button>
+            <button id="nav-mobile-cli" class="mobile-nav-item neo-button flex flex-col items-center justify-center py-1.5 px-2.5 text-[#7E8490] rounded-xl text-[10px] font-semibold min-w-[56px] transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-[20px]">terminal</span>
+                <span class="mt-0.5">CLI</span>
+            </button>
+            <button id="nav-mobile-arch" class="mobile-nav-item neo-button flex flex-col items-center justify-center py-1.5 px-2.5 text-[#7E8490] rounded-xl text-[10px] font-semibold min-w-[56px] transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-[20px]">account_tree</span>
+                <span class="mt-0.5">Arch</span>
+            </button>
+            <button id="nav-mobile-help" class="mobile-nav-item neo-button flex flex-col items-center justify-center py-1.5 px-2.5 text-[#7E8490] rounded-xl text-[10px] font-semibold min-w-[56px] transition-all cursor-pointer">
+                <span class="material-symbols-outlined text-[20px]">help_center</span>
+                <span class="mt-0.5">Help</span>
+            </button>
+        </nav>
+    </main>
+
+    <div id="login-overlay" class="flex flex-col items-center justify-center absolute inset-0 bg-[#E8EBF2] z-50 p-4">
+        <div class="neo-card p-6 sm:p-8 flex flex-col items-center max-w-sm w-full">
+            
+            <div class="flex flex-col items-center text-center mb-5">
+                <div class="w-14 h-14 rounded-2xl bg-accent-blue/10 flex items-center justify-center mb-2.5 neo-inset shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06),inset_-2px_-2px_4px_rgba(255,255,255,0.8)] border border-white/60">
+                    <span class="material-symbols-outlined text-accent-blue text-3xl">database</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-[#2A2F33] tracking-tight mb-1.5">RediForge</h1>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider text-accent-blue bg-accent-blue/10 border border-accent-blue/20 mb-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-accent-blue animate-pulse"></span>
+                    Redis-Compatible Engine
+                </div>
+                <p class="text-xs text-[#7E8490] leading-relaxed max-w-[270px] text-center font-normal">
+                    High-performance in-memory cache &amp; real-time telemetry console
+                </p>
+            </div>
+            
+            <div id="google-signin-container" class="mb-4 w-full flex flex-col items-center">
+                <button id="btn-google-signin" class="neo-button w-full py-2.5 px-4 flex items-center justify-center gap-2.5 text-xs sm:text-sm font-semibold text-[#2A2F33] hover:text-accent-blue transition-all bg-white/40 border border-white/80 rounded-xl shadow-md active:scale-95 cursor-pointer" type="button" title="Sign in with Google">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    <span id="google-btn-text">Sign in with Google</span>
+                </button>
+                <div id="google-gsi-slot" class="hidden w-full mt-2"></div>
+            </div>
+            
+            <div class="w-full flex items-center mb-4" id="manual-login-divider">
+                <div class="flex-grow border-t border-[#C4C9D4]"></div>
+                <span class="mx-2 text-xs font-bold text-[#7E8490] uppercase">Or manual connect</span>
+                <div class="flex-grow border-t border-[#C4C9D4]"></div>
+            </div>
+
+            <input type="text" id="ws-url" value="wss://rediforge.in" class="neo-inset w-full p-3 mb-3 text-center font-mono text-sm text-[#2A2F33]" placeholder="Server URL (e.g. wss://rediforge.in)">
+            <input type="password" id="ws-auth" class="neo-inset w-full p-3 mb-4 text-center font-mono text-sm text-[#2A2F33]" placeholder="Password / Auth Token (optional)">
+            <button id="btn-connect" class="neo-button neo-button-primary w-full p-3 text-lg font-bold">Connect</button>
+            <p id="login-error" class="text-accent-red mt-3 text-xs font-bold text-center min-h-[1.25rem]"></p>
+
+            <div class="mt-4 pt-4 border-t border-[#C4C9D4]/40 w-full flex justify-around text-xs font-semibold text-[#7E8490]">
+                <a href="/register" class="hover:text-accent-blue">Create Account</a>
+                <span>•</span>
+                <a href="/forgot-password" class="hover:text-accent-blue">Forgot Password?</a>
+            </div>
         </div>
     </div>
 
-    <!-- Onboarding Tour Overlay -->
+    <div id="modal-legal" class="hidden neo-modal-backdrop">
+        <div class="neo-modal neo-modal-xl max-h-[85vh] flex flex-col p-6">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-accent-blue text-2xl">policy</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-[#2A2F33]" id="legal-modal-title">Legal & Compliance Center</h3>
+                        <p class="text-xs text-[#7E8490]">Policies, Agreements, and Guidelines for RediForge</p>
+                    </div>
+                </div>
+                <button id="btn-close-legal" class="text-[#7E8490] hover:text-accent-red"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 my-4 flex-grow overflow-hidden">
+                
+                <div class="md:col-span-4 flex flex-col gap-1 overflow-y-auto max-h-[55vh] pr-2">
+                    <div class="text-[11px] font-bold text-[#7E8490] uppercase tracking-wider mb-1 px-2">Core Agreements</div>
+                    <button class="legal-nav-btn text-left px-3 py-2 text-xs font-semibold rounded neo-inset text-accent-blue" data-doc="privacy">Privacy Policy</button>
+                    <button class="legal-nav-btn text-left px-3 py-2 text-xs font-semibold rounded hover:bg-white/50 text-[#7E8490]" data-doc="terms">Terms of Service</button>
+                    <button class="legal-nav-btn text-left px-3 py-2 text-xs font-semibold rounded hover:bg-white/50 text-[#7E8490]" data-doc="dpa">Data Processing (DPA)</button>
+                    <button class="legal-nav-btn text-left px-3 py-2 text-xs font-semibold rounded hover:bg-white/50 text-[#7E8490]" data-doc="aup">Acceptable Use (AUP)</button>
+                    
+                    <div class="text-[11px] font-bold text-[#7E8490] uppercase tracking-wider mt-3 mb-1 px-2">Security & Privacy</div>
+                    <button class="legal-nav-btn text-left px-3 py-2 text-xs font-semibold rounded hover:bg-white/50 text-[#7E8490]" data-doc="security">Security Policy</button>
+                    <button class="legal-nav-btn text-left px-3 py-2 text-xs font-semibold rounded hover:bg-white/50 text-[#7E8490]" data-doc="disclosure">Responsible Disclosure</button>
+                    <button class="legal-nav-btn text-left px-3 py-2 text-xs font-semibold rounded hover:bg-white/50 text-[#7E8490]" data-doc="cookies">Cookie Policy</button>
+                    
+                    <div class="text-[11px] font-bold text-[#7E8490] uppercase tracking-wider mt-3 mb-1 px-2">Compliance & Trust</div>
+                    <button class="legal-nav-btn text-left px-3 py-2 text-xs font-semibold rounded hover:bg-white/50 text-[#7E8490]" data-doc="accessibility">Accessibility Statement</button>
+                    <button class="legal-nav-btn text-left px-3 py-2 text-xs font-semibold rounded hover:bg-white/50 text-[#7E8490]" data-doc="disclaimer">Legal Disclaimer</button>
+                    <button class="legal-nav-btn text-left px-3 py-2 text-xs font-semibold rounded hover:bg-white/50 text-[#7E8490]" data-doc="community">Community Guidelines</button>
+                </div>
+
+                <div class="md:col-span-8 neo-inset p-5 overflow-y-auto max-h-[55vh] bg-white/60 legal-content" id="legal-content-body">
+                    
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-3 border-t border-[#C4C9D4]/30 text-xs text-[#7E8490]">
+                <span>Last Updated: September 14, 2026</span>
+                <button id="btn-print-legal" class="neo-button px-3 py-1.5 flex items-center gap-1 text-accent-blue"><span class="material-symbols-outlined text-[16px]">print</span> Print Policy</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-cookie-prefs" class="hidden neo-modal-backdrop">
+        <div class="neo-modal p-6 flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <h3 class="text-lg font-bold text-[#2A2F33] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-blue">cookie</span> Cookie Preferences
+                </h3>
+                <button id="btn-close-cookie-prefs" class="text-[#7E8490] hover:text-accent-red"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <p class="text-xs text-[#7E8490] leading-relaxed">
+                Manage how cookies and local storage tokens are used on RediForge. Necessary cookies are required for real-time WebSocket sessions and cryptographic JWT verification.
+            </p>
+            <div class="space-y-3">
+                <div class="p-3 neo-inset rounded flex justify-between items-center">
+                    <div>
+                        <div class="text-xs font-bold text-[#2A2F33]">Strictly Necessary Cookies</div>
+                        <div class="text-[11px] text-[#7E8490]">Essential for Google OAuth sessions and WebSocket authentication.</div>
+                    </div>
+                    <span class="text-xs font-mono font-bold text-accent-green">Always Active</span>
+                </div>
+                <div class="p-3 neo-card rounded flex justify-between items-center">
+                    <div>
+                        <div class="text-xs font-bold text-[#2A2F33]">Performance & Telemetry</div>
+                        <div class="text-[11px] text-[#7E8490]">Anonymous RAM & throughput metrics for live dashboards.</div>
+                    </div>
+                    <input type="checkbox" id="cookie-telemetry-toggle" checked class="h-4 w-4 text-accent-blue rounded">
+                </div>
+                <div class="p-3 neo-card rounded flex justify-between items-center">
+                    <div>
+                        <div class="text-xs font-bold text-[#2A2F33]">Functional Preferences</div>
+                        <div class="text-[11px] text-[#7E8490]">Stores CLI history, database selector preferences, and tour status.</div>
+                    </div>
+                    <input type="checkbox" id="cookie-pref-toggle" checked class="h-4 w-4 text-accent-blue rounded">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-3 border-t border-[#C4C9D4]/30">
+                <button id="btn-reject-cookies" class="neo-button px-4 py-2 text-xs text-[#7E8490]">Reject Optional</button>
+                <button id="btn-save-cookie-prefs" class="neo-button neo-button-primary px-4 py-2 text-xs font-bold">Save Preferences</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cookie-consent-banner" class="hidden">
+        <div class="flex items-start gap-3 mb-3">
+            <span class="material-symbols-outlined text-accent-blue text-2xl">cookie</span>
+            <div>
+                <h4 class="text-sm font-bold text-[#2A2F33]">Cookie & Privacy Choice</h4>
+                <p class="text-xs text-[#7E8490] mt-1 leading-relaxed">
+                    We use essential session tokens and anonymous metrics to ensure secure Redis WebSocket connections.
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center justify-between gap-2 pt-2 border-t border-[#C4C9D4]/30">
+            <a href="/cookie-preferences" class="text-xs text-accent-blue font-semibold hover:underline">Customize</a>
+            <div class="flex gap-2">
+                <button id="btn-cookie-accept-all" class="neo-button neo-button-primary px-3 py-1.5 text-xs font-bold">Accept All</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-account" class="hidden neo-modal-backdrop">
+        <div class="neo-modal neo-modal-lg p-6 flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <h3 class="text-lg font-bold text-[#2A2F33] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-blue">manage_accounts</span> Account & Security Settings
+                </h3>
+                <button id="btn-close-account" class="text-[#7E8490] hover:text-accent-red"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            
+            <div class="flex gap-2 border-b border-[#C4C9D4]/30 pb-2">
+                <button class="account-tab-btn text-xs font-bold text-accent-blue border-b-2 border-accent-blue pb-1" data-tab="profile">Profile</button>
+                <button class="account-tab-btn text-xs font-bold text-[#7E8490] pb-1" data-tab="apikeys">API Bearer Keys</button>
+                <button class="account-tab-btn text-xs font-bold text-[#7E8490] pb-1" data-tab="sessions">Active Sessions</button>
+            </div>
+
+            <div id="account-tab-profile" class="space-y-3">
+                <div class="flex items-center gap-4 p-3 neo-card rounded-lg">
+                    <div class="w-12 h-12 rounded-full bg-accent-blue/20 flex items-center justify-center text-accent-blue font-bold text-xl">
+                        <span class="material-symbols-outlined">person</span>
+                    </div>
+                    <div>
+                        <div id="account-profile-name" class="font-bold text-sm text-[#2A2F33]">Ashutosh Yadav</div>
+                        <div id="account-profile-email" class="text-xs text-[#7E8490]">ashutosh4tech@gmail.com</div>
+                        <span class="neo-badge text-[10px] text-accent-green inline-block mt-1">Creator & Administrator</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <a href="https://ashutoshwork.space/" target="_blank" rel="noopener noreferrer" class="neo-button p-2 text-center text-xs font-bold text-accent-blue flex items-center justify-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px]">language</span> Portfolio
+                    </a>
+                    <a href="https://www.linkedin.com/in/ashutoshyadav256" target="_blank" rel="noopener noreferrer" class="neo-button p-2 text-center text-xs font-bold text-accent-blue flex items-center justify-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px]">business_center</span> LinkedIn
+                    </a>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Assigned Workspace</label>
+                    <input type="text" value="default-workspace" class="neo-inset w-full p-2 text-xs font-mono" readonly>
+                </div>
+            </div>
+
+            <div id="account-tab-apikeys" class="space-y-3 hidden">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-[#7E8490]">Use bearer tokens for programmatic Redis WebSocket access.</span>
+                    <button id="btn-generate-apikey" class="neo-button neo-button-primary px-3 py-1 text-xs font-bold flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">add</span> Generate Key
+                    </button>
+                </div>
+                <div id="apikey-list" class="space-y-2">
+                    <div class="p-3 neo-inset rounded flex justify-between items-center font-mono text-xs">
+                        <span class="truncate max-w-[280px]">rf_sec_99182a884fbc9...</span>
+                        <button class="btn-copy-key text-accent-blue hover:underline" data-key="rf_sec_99182a884fbc901a88b1">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="account-tab-sessions" class="space-y-3 hidden">
+                <div class="text-xs text-[#7E8490]">Currently active authenticated connections:</div>
+                <div class="p-3 neo-card rounded flex justify-between items-center text-xs">
+                    <div>
+                        <div class="font-bold text-[#2A2F33]">Current Browser Session</div>
+                        <div class="text-[11px] text-[#7E8490]">HTTPS / WebSocket on rediforge.in</div>
+                    </div>
+                    <span class="text-accent-green font-bold">Active Now</span>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-3 border-t border-[#C4C9D4]/30">
+                <button id="btn-save-account" class="neo-button neo-button-primary px-4 py-2 text-xs font-bold">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-help-center" class="hidden neo-modal-backdrop">
+        <div class="neo-modal neo-modal-lg p-6 flex flex-col gap-4 max-h-[85vh]">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <h3 class="text-lg font-bold text-[#2A2F33] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-blue">help_center</span> Help Center & FAQ
+                </h3>
+                <button id="btn-close-help-center" class="text-[#7E8490] hover:text-accent-red"><span class="material-symbols-outlined">close</span></button>
+            </div>
+
+            <div class="relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#7E8490] text-[18px]">search</span>
+                <input id="help-search-input" type="text" class="neo-inset w-full py-2 pl-10 pr-4 font-mono text-xs placeholder:text-[#7E8490]" placeholder="Search documentation (e.g. SET, TTL, OAuth, Backup)..."/>
+            </div>
+
+            <div class="space-y-2 overflow-y-auto max-h-[50vh] pr-1" id="faq-accordion-container">
+                
+            </div>
+
+            <div class="flex justify-between items-center pt-3 border-t border-[#C4C9D4]/30 text-xs">
+                <span class="text-[#7E8490]">Still need assistance?</span>
+                <button id="btn-open-support-from-help" class="neo-button neo-button-primary px-3 py-1.5 font-bold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px]">support_agent</span> Contact Support
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-support-ticket" class="hidden neo-modal-backdrop">
+        <div class="neo-modal p-6 flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <h3 class="text-lg font-bold text-[#2A2F33] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-blue">support</span> Submit Support Ticket
+                </h3>
+                <button id="btn-close-support" class="text-[#7E8490] hover:text-accent-red"><span class="material-symbols-outlined">close</span></button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Subject</label>
+                    <input type="text" id="ticket-subject" class="neo-inset w-full p-2 text-xs" placeholder="e.g. WebSocket connection timeout"/>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Category</label>
+                    <select id="ticket-category" class="neo-inset w-full p-2 text-xs bg-transparent">
+                        <option value="technical">Technical / Engine Behavior</option>
+                        <option value="general">General Support & Inquiry</option>
+                        <option value="security">Security & Access Control</option>
+                        <option value="feature">Feature Request</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Issue Description</label>
+                    <textarea id="ticket-message" class="neo-inset w-full p-2 text-xs h-24" placeholder="Describe the issue or error you encountered..."></textarea>
+                </div>
+                <div class="p-2 neo-inset rounded text-[11px] text-[#7E8490] flex items-center justify-between">
+                    <span>Direct Developer Reach:</span>
+                    <a href="mailto:ashutosh4tech@gmail.com" class="text-accent-blue font-bold hover:underline">ashutosh4tech@gmail.com</a>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-[#7E8490]">
+                    <input type="checkbox" id="ticket-attach-telemetry" checked class="h-4 w-4 text-accent-blue rounded">
+                    <label for="ticket-attach-telemetry">Attach diagnostic memory & connection telemetry logs</label>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-3 border-t border-[#C4C9D4]/30">
+                <button id="btn-cancel-support" class="neo-button px-4 py-2 text-xs text-[#7E8490]">Cancel</button>
+                <button id="btn-submit-support" class="neo-button neo-button-primary px-4 py-2 text-xs font-bold">Submit Ticket</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-auth-flows" class="hidden neo-modal-backdrop">
+        <div class="neo-modal p-6 flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <h3 class="text-lg font-bold text-[#2A2F33]" id="auth-flow-title">Create Account</h3>
+                <button id="btn-close-auth-flow" class="text-[#7E8490] hover:text-accent-red"><span class="material-symbols-outlined">close</span></button>
+            </div>
+
+            <div id="auth-flow-body" class="space-y-3">
+                
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-system-state" class="hidden neo-modal-backdrop">
+        <div class="neo-modal p-8 flex flex-col items-center text-center gap-4 max-w-md">
+            <div id="system-state-icon" class="w-16 h-16 rounded-full bg-accent-blue/15 flex items-center justify-center text-accent-blue text-3xl">
+                <span class="material-symbols-outlined text-4xl">error_outline</span>
+            </div>
+            <h3 class="text-2xl font-bold text-[#2A2F33]" id="system-state-title">Page Not Found</h3>
+            <p class="text-xs text-[#7E8490] leading-relaxed" id="system-state-msg">
+                The requested key or resource does not exist or has expired from cache.
+            </p>
+            <div class="flex gap-3 mt-2">
+                <button id="btn-system-state-action" class="neo-button neo-button-primary px-5 py-2.5 text-xs font-bold">Return to Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-system-status" class="hidden neo-modal-backdrop">
+        <div class="neo-modal neo-modal-lg p-6 flex flex-col gap-4 max-w-2xl w-full">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-green text-2xl">vital_signs</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-[#2A2F33]">System Health & Cluster Status</h3>
+                        <p class="text-[11px] text-[#7E8490]">Real-time operational metrics and datastore engine diagnostics</p>
+                    </div>
+                </div>
+                <button id="btn-close-system-status" class="neo-button p-1.5 rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+
+            <div class="p-3 neo-card bg-accent-green/10 border border-accent-green/30 rounded-xl flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-3 h-3 rounded-full bg-accent-green animate-pulse"></span>
+                    <span class="text-xs font-bold text-accent-green">All Core Engine Systems Operational</span>
+                </div>
+                <span class="text-[11px] font-mono text-[#7E8490]">SLA: 99.99%</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div class="p-3 neo-inset rounded-lg flex flex-col gap-1">
+                    <div class="flex justify-between items-center text-[#7E8490] font-semibold">
+                        <span>WebSocket Gateway</span>
+                        <span class="skill-indicator indicator-green"></span>
+                    </div>
+                    <div class="font-bold text-[#2A2F33] text-sm" id="status-ws-gateway">wss://rediforge.in (Online)</div>
+                    <div class="text-[10px] text-[#7E8490]">Bi-directional RESP2 Stream</div>
+                </div>
+
+                <div class="p-3 neo-inset rounded-lg flex flex-col gap-1">
+                    <div class="flex justify-between items-center text-[#7E8490] font-semibold">
+                        <span>Engine Protocol</span>
+                        <span class="skill-indicator indicator-blue"></span>
+                    </div>
+                    <div class="font-bold text-[#2A2F33] text-sm">Redis 7.0 Wire Compatible</div>
+                    <div class="text-[10px] text-[#7E8490]">TCP 6379 + WS Bridge</div>
+                </div>
+
+                <div class="p-3 neo-inset rounded-lg flex flex-col gap-1">
+                    <div class="flex justify-between items-center text-[#7E8490] font-semibold">
+                        <span>Cluster Uptime</span>
+                        <span class="material-symbols-outlined text-[14px] text-accent-blue">schedule</span>
+                    </div>
+                    <div class="font-bold text-[#2A2F33] text-sm" id="status-uptime-val">Live (Active)</div>
+                    <div class="text-[10px] text-[#7E8490]">Zero downtime failover ready</div>
+                </div>
+
+                <div class="p-3 neo-inset rounded-lg flex flex-col gap-1">
+                    <div class="flex justify-between items-center text-[#7E8490] font-semibold">
+                        <span>Databases (DB0 - DB15)</span>
+                        <span class="skill-indicator indicator-green"></span>
+                    </div>
+                    <div class="font-bold text-[#2A2F33] text-sm">16 Logical Databases Ready</div>
+                    <div class="text-[10px] text-[#7E8490]">Isolated Keyspace Execution</div>
+                </div>
+
+                <div class="p-3 neo-inset rounded-lg flex flex-col gap-1">
+                    <div class="flex justify-between items-center text-[#7E8490] font-semibold">
+                        <span>Persistence Layer</span>
+                        <span class="skill-indicator indicator-blue"></span>
+                    </div>
+                    <div class="font-bold text-[#2A2F33] text-sm">AOF Stream + RDB Snapshots</div>
+                    <div class="text-[10px] text-[#7E8490]">Zero Data Loss on Restart</div>
+                </div>
+
+                <div class="p-3 neo-inset rounded-lg flex flex-col gap-1">
+                    <div class="flex justify-between items-center text-[#7E8490] font-semibold">
+                        <span>Security & SSRF Guard</span>
+                        <span class="skill-indicator indicator-green"></span>
+                    </div>
+                    <div class="font-bold text-[#2A2F33] text-sm">RBAC & Token Rate Limiter</div>
+                    <div class="text-[10px] text-[#7E8490]">Strict IP & Dangerous Cmd Filters</div>
+                </div>
+            </div>
+
+            <div class="p-3 neo-card rounded-xl flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-blue text-lg">speed</span>
+                    <div>
+                        <div class="text-xs font-bold text-[#2A2F33]">Round-Trip Latency (RTT)</div>
+                        <div class="text-[11px] font-mono text-[#7E8490]" id="status-ping-result">Click 'Run Ping Test' to benchmark latency</div>
+                    </div>
+                </div>
+                <button id="btn-run-status-ping" class="neo-button neo-button-primary px-3 py-1.5 text-xs font-bold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">bolt</span> Run Ping Test
+                </button>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-[#C4C9D4]/30">
+                <button id="btn-status-view-dashboard" class="neo-button neo-button-primary px-4 py-2 text-xs font-bold">Back to Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-architecture" class="hidden neo-modal-backdrop">
+
+        <div class="neo-modal neo-modal-xl max-h-[88vh] flex flex-col p-6 overflow-hidden max-w-4xl w-full">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3 flex-shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="material-symbols-outlined text-accent-blue text-2xl">account_tree</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-[#2A2F33] flex items-center gap-2">
+                            RediForge System Architecture & Engineering Whitepaper
+                            <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-accent-blue/15 text-accent-blue font-bold">Deep-Dive</span>
+                        </h3>
+                        <p class="text-[11px] text-[#7E8490]">High-Level Architecture, Subsystems, Workflows & Developer Philosophy</p>
+                    </div>
+                </div>
+                <button id="btn-close-architecture" class="neo-button p-1.5 rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+            </div>
+
+            <div class="flex gap-2 border-b border-[#C4C9D4]/30 pt-3 pb-2 text-xs font-bold flex-shrink-0 overflow-x-auto">
+                <button class="arch-tab-btn text-accent-blue border-b-2 border-accent-blue pb-1" data-tab="overview">1. Overview & Motivation</button>
+                <button class="arch-tab-btn text-[#7E8490] pb-1" data-tab="architecture">2. System Architecture</button>
+                <button class="arch-tab-btn text-[#7E8490] pb-1" data-tab="internals">3. Engine Internals & RESP</button>
+                <button class="arch-tab-btn text-[#7E8490] pb-1" data-tab="persistence">4. Persistence & Memory</button>
+                <button class="arch-tab-btn text-[#7E8490] pb-1" data-tab="usecases">5. Use Cases & Philosophy</button>
+            </div>
+
+            <div class="flex-grow overflow-y-auto mt-4 space-y-4 pr-1 text-xs text-[#2A2F33] leading-relaxed">
+
+                <div id="arch-tab-overview" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="p-4 neo-card rounded-xl">
+                            <div class="flex items-center gap-2 text-accent-blue font-bold mb-1">
+                                <span class="material-symbols-outlined text-lg">memory</span> WHAT IS REDIFORGE?
+                            </div>
+                            <p class="text-[#7E8490] text-[11px] leading-relaxed">
+                                An enterprise-grade, memory-first key-value database engineered from the ground up to provide <strong>100% RESP2 wire compatibility</strong> with standard Redis clients (<code class="font-mono text-[#2A2F33]">redis-py</code>, <code class="font-mono text-[#2A2F33]">ioredis</code>, <code class="font-mono text-[#2A2F33]">Jedis</code>) alongside an integrated real-time WebSocket observability console.
+                            </p>
+                        </div>
+                        <div class="p-4 neo-card rounded-xl">
+                            <div class="flex items-center gap-2 text-accent-orange font-bold mb-1">
+                                <span class="material-symbols-outlined text-lg">lightbulb</span> WHY WAS IT CREATED?
+                            </div>
+                            <p class="text-[#7E8490] text-[11px] leading-relaxed">
+                                Built to demonstrate <strong>first-principles systems engineering</strong> with zero external runtime dependencies in the data engine, while providing developers with a transparent, fully auditable alternative following recent Redis commercial licensing shifts.
+                            </p>
+                        </div>
+                        <div class="p-4 neo-card rounded-xl">
+                            <div class="flex items-center gap-2 text-accent-green font-bold mb-1">
+                                <span class="material-symbols-outlined text-lg">check_circle</span> PROBLEMS SOLVED
+                            </div>
+                            <p class="text-[#7E8490] text-[11px] leading-relaxed">
+                                Delivers <strong>sub-millisecond data access</strong>, prevents accidental data erasure via dangerous command interceptors (<code class="font-mono text-[#2A2F33]">FLUSHALL</code>), and eliminates external sidecar complexity with unified live WebSocket telemetry.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 neo-inset rounded-xl space-y-3">
+                        <h4 class="font-bold text-[#2A2F33] text-sm flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-accent-blue text-base">verified</span> Core Technical Pillars
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="p-3 bg-white/50 rounded-lg border border-[#C4C9D4]/40 flex items-start gap-2.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-accent-blue mt-1 flex-shrink-0"></span>
+                                <div class="text-xs text-[#2A2F33] leading-relaxed">
+                                    <span class="font-bold text-[#2A2F33]">Zero Runtime Engine Dependencies:</span>
+                                    <span class="text-[#7E8490] block mt-0.5">Native standard library execution with zero external runtime packages.</span>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-white/50 rounded-lg border border-[#C4C9D4]/40 flex items-start gap-2.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-accent-green mt-1 flex-shrink-0"></span>
+                                <div class="text-xs text-[#2A2F33] leading-relaxed">
+                                    <span class="font-bold text-[#2A2F33]">Multi-Database Isolation:</span>
+                                    <span class="text-[#7E8490] block mt-0.5">16 independent logical databases (<code class="font-mono text-xs text-[#2A2F33] bg-[#E8EBF2] px-1 py-0.5 rounded">db0</code> – <code class="font-mono text-xs text-[#2A2F33] bg-[#E8EBF2] px-1 py-0.5 rounded">db15</code>).</span>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-white/50 rounded-lg border border-[#C4C9D4]/40 flex items-start gap-2.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-accent-purple mt-1 flex-shrink-0"></span>
+                                <div class="text-xs text-[#2A2F33] leading-relaxed">
+                                    <span class="font-bold text-[#2A2F33]">Dual Persistence Engine:</span>
+                                    <span class="text-[#7E8490] block mt-0.5">Point-in-time binary RDB snapshots + Append-Only AOF write-ahead logs.</span>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-white/50 rounded-lg border border-[#C4C9D4]/40 flex items-start gap-2.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-accent-red mt-1 flex-shrink-0"></span>
+                                <div class="text-xs text-[#2A2F33] leading-relaxed">
+                                    <span class="font-bold text-[#2A2F33]">Enterprise SSRF & RBAC Guard:</span>
+                                    <span class="text-[#7E8490] block mt-0.5">Loopback IP filters, IPv6 evasions blocker, and structured audit logs.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="arch-tab-architecture" class="space-y-4 hidden">
+                    <div class="p-3 neo-card rounded-xl">
+                        <h4 class="font-bold text-[#2A2F33] text-xs uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-accent-blue">schema</span> High-Level System Architecture Diagram
+                        </h4>
+                        <div class="font-mono text-[10px] bg-[#1E2327] text-[#C4C9D4] p-3 rounded-lg overflow-x-auto leading-relaxed">
+                            <pre>
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              CLIENT ACCESS LAYER                                │
+│   [redis-cli]         [ioredis / redis-py / Jedis]        [Web GUI Console]    │
+└─────────┬──────────────────────────┬───────────────────────────────┬────────────┘
+          │ (TCP Port 6379)          │ (TCP Port 6379)               │ (HTTPS/WSS)
+          ▼                          ▼                               ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                       GATEWAY & PROTOCOL PARSER LAYER                           │
+│   • TCP Socket Manager (server.js)        • HTTP/WS Gateway Bridge (bridge.js)  │
+│   • Binary RESP2 State Machine (parser.js) • OAuth & JWT Security Authenticator │
+└────────────────────────────────────┬────────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                      SECURITY & COMMAND ROUTING GATEWAY                         │
+│   • requirepass Auth Guard                 • Dangerous Command Interceptor       │
+│   • RBAC Role Evaluator (Admin/Dev/Read)   • Structured Password-Redacted Audit  │
+└────────────────────────────────────┬────────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                         CORE IN-MEMORY DATASTORE ENGINE                         │
+│   [db0]   [db1]   [db2]   [db3]   ...   [db14]   [db15] (16 Isolated Databases) │
+│   Data Types: Strings | Hashes | Lists | Sets | Sorted Sets | Bitmaps           │
+│   ├─ TTL Expiry (Passive check-on-access + Active 100ms cron sampling)          │
+│   └─ LRU Memory Accounting (MaxMemory threshold eviction manager)               │
+└────────────────────────────────────┬────────────────────────────────────────────┘
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              PERSISTENCE SUBSYSTEM                              │
+│   • Binary RDB Snapshot Engine (rdb.js)   • Write-Ahead AOF Logger (aof.js)     │
+└─────────────────────────────────────────────────────────────────────────────────┘</pre>
+                        </div>
+                    </div>
+
+                    <div class="p-3 neo-inset rounded-xl space-y-1 text-[11px] text-[#7E8490]">
+                        <div class="font-bold text-[#2A2F33] text-xs">Request Execution Workflow:</div>
+                        <div>1. <strong>Packet Ingestion:</strong> Raw bytes received on TCP socket or WebSocket framing buffer.</div>
+                        <div>2. <strong>RESP Framing:</strong> State machine parses stream chunks into command arguments array (<code class="font-mono">['SET', 'key', 'val']</code>).</div>
+                        <div>3. <strong>Security Pipeline:</strong> Command Gateway validates session authentication, RBAC privileges, and danger bounds.</div>
+                        <div>4. <strong>Engine Execution:</strong> Target database executes command with $\mathcal{O}(1)$ or $\mathcal{O}(\log N)$ complexity.</div>
+                        <div>5. <strong>Replication & Persistence:</strong> If mutating, command is appended to AOF stream and TTL tracked in expiry heap.</div>
+                        <div>6. <strong>Encoding & Egress:</strong> Result serialized to standard RESP2 bytes and pushed to socket buffer.</div>
+                    </div>
+                </div>
+
+                <div id="arch-tab-internals" class="space-y-4 hidden">
+                    <div class="p-3 neo-card rounded-xl">
+                        <h4 class="font-bold text-[#2A2F33] text-xs uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-accent-purple">data_object</span> Data Structures & Algorithmic Complexities
+                        </h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-[11px] border-collapse">
+                                <thead>
+                                    <tr class="border-b border-[#C4C9D4]/40 text-[#7E8490]">
+                                        <th class="py-1.5">Data Type</th>
+                                        <th class="py-1.5">Internal Structure</th>
+                                        <th class="py-1.5">Read Complexity</th>
+                                        <th class="py-1.5">Write Complexity</th>
+                                        <th class="py-1.5">Primary Redis Commands</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#C4C9D4]/20 text-[#2A2F33]">
+                                    <tr>
+                                        <td class="py-1.5 font-bold text-accent-blue">String</td>
+                                        <td class="py-1.5 font-mono text-[10px]">Flat Native Buffer / V8 String</td>
+                                        <td class="py-1.5 font-mono">O(1)</td>
+                                        <td class="py-1.5 font-mono">O(1)</td>
+                                        <td class="py-1.5 font-mono text-[10px]">SET, GET, INCR, APPEND</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-1.5 font-bold text-accent-green">Hash</td>
+                                        <td class="py-1.5 font-mono text-[10px]">Hash Map (Map&lt;string, string&gt;)</td>
+                                        <td class="py-1.5 font-mono">O(1)</td>
+                                        <td class="py-1.5 font-mono">O(1)</td>
+                                        <td class="py-1.5 font-mono text-[10px]">HSET, HGET, HDEL, HGETALL</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-1.5 font-bold text-accent-orange">List</td>
+                                        <td class="py-1.5 font-mono text-[10px]">Doubly-Linked Node Buffer Array</td>
+                                        <td class="py-1.5 font-mono">O(1) head/tail</td>
+                                        <td class="py-1.5 font-mono">O(1) push/pop</td>
+                                        <td class="py-1.5 font-mono text-[10px]">LPUSH, RPUSH, LPOP, LRANGE</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-1.5 font-bold text-accent-purple">Set</td>
+                                        <td class="py-1.5 font-mono text-[10px]">Unique Hash Table (Set&lt;string&gt;)</td>
+                                        <td class="py-1.5 font-mono">O(1)</td>
+                                        <td class="py-1.5 font-mono">O(1)</td>
+                                        <td class="py-1.5 font-mono text-[10px]">SADD, SMEMBERS, SREM, SISMEMBER</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-1.5 font-bold text-accent-red">Sorted Set</td>
+                                        <td class="py-1.5 font-mono text-[10px]">Balanced Score Array + Hash Map</td>
+                                        <td class="py-1.5 font-mono">O(log N)</td>
+                                        <td class="py-1.5 font-mono">O(log N)</td>
+                                        <td class="py-1.5 font-mono text-[10px]">ZADD, ZRANGE, ZREM, ZSCORE</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="p-3 neo-inset rounded-xl space-y-2">
+                        <div class="font-bold text-[#2A2F33] text-xs">RESP2 Protocol Parser Implementation</div>
+                        <p class="text-[11px] text-[#7E8490] leading-relaxed">
+                            The parser in <code class="font-mono text-[#2A2F33]">src/protocol/parser.js</code> is written as a zero-copy state machine that processes arbitrary streaming chunks without memory leaks. It recognizes all 5 RESP2 types: Simple Strings (<code class="font-mono text-accent-blue">+</code>), Errors (<code class="font-mono text-accent-red">-</code>), Integers (<code class="font-mono text-accent-purple">:</code>), Bulk Strings (<code class="font-mono text-accent-green">$</code>), and Arrays (<code class="font-mono text-accent-orange">*</code>).
+                        </p>
+                    </div>
+                </div>
+
+                <div id="arch-tab-persistence" class="space-y-4 hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="p-4 neo-card rounded-xl space-y-2">
+                            <div class="flex items-center gap-2 text-accent-blue font-bold">
+                                <span class="material-symbols-outlined text-lg">save</span> RDB Binary Snapshotting
+                            </div>
+                            <p class="text-[11px] text-[#7E8490] leading-relaxed">
+                                Generates a compact point-in-time binary snapshot file (<code class="font-mono">dump.rdb</code>). Encodes database selector opcodes (<code class="font-mono">0xFE</code>), expiration timestamps (<code class="font-mono">0xFD</code> in sec, <code class="font-mono">0xFC</code> in ms), type descriptors, length-prefixed binary strings, and EOF delimiters.
+                            </p>
+                        </div>
+                        <div class="p-4 neo-card rounded-xl space-y-2">
+                            <div class="flex items-center gap-2 text-accent-orange font-bold">
+                                <span class="material-symbols-outlined text-lg">history_edu</span> AOF Write-Ahead Logging
+                            </div>
+                            <p class="text-[11px] text-[#7E8490] leading-relaxed">
+                                Logs every write command to <code class="font-mono">appendonly.aof</code> in valid RESP format. Supports configurable <code class="font-mono">fsync</code> policies (<code class="font-mono">always</code>, <code class="font-mono">everysec</code>, <code class="font-mono">no</code>) to guarantee zero data loss on crashes.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 neo-inset rounded-xl space-y-2">
+                        <h4 class="font-bold text-[#2A2F33] text-xs flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-accent-green">timer</span> Dual-Phase Expiry & LRU Eviction Subsystem
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px] text-[#7E8490]">
+                            <div class="p-2.5 neo-card rounded-lg">
+                                <div class="font-bold text-[#2A2F33] mb-1">1. Passive Eviction (On-Access)</div>
+                                When a key is requested by any read command, its expiration timestamp is evaluated against <code class="font-mono">Date.now()</code>. Expired keys are deleted immediately.
+                            </div>
+                            <div class="p-2.5 neo-card rounded-lg">
+                                <div class="font-bold text-[#2A2F33] mb-1">2. Active Probabilistic Cron</div>
+                                A timer fires every <strong>100ms</strong>, sampling 20 volatile keys per database. If &gt;25% are expired, the cycle repeats to prevent memory bloat.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="arch-tab-usecases" class="space-y-4 hidden">
+                    <div class="p-4 neo-card rounded-xl space-y-2">
+                        <h4 class="font-bold text-[#2A2F33] text-xs uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-accent-blue">rocket_launch</span> Key Industry Use Cases
+                        </h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-[#7E8490]">
+                            <div class="p-2 neo-inset rounded flex items-start gap-2">
+                                <span class="material-symbols-outlined text-accent-blue text-[18px] flex-shrink-0 mt-0.5">rocket_launch</span>
+                                <div><strong class="text-[#2A2F33]">Distributed Session Cache:</strong> Microsecond user session & auth token lookups with automatic TTL expiration.</div>
+                            </div>
+                            <div class="p-2 neo-inset rounded flex items-start gap-2">
+                                <span class="material-symbols-outlined text-accent-orange text-[18px] flex-shrink-0 mt-0.5">timer</span>
+                                <div><strong class="text-[#2A2F33]">API Rate Limiting:</strong> Sliding-window and token-bucket API quota enforcement using atomic <code class="font-mono">INCR</code> and <code class="font-mono">EXPIRE</code>.</div>
+                            </div>
+                            <div class="p-2 neo-inset rounded flex items-start gap-2">
+                                <span class="material-symbols-outlined text-accent-green text-[18px] flex-shrink-0 mt-0.5">leaderboard</span>
+                                <div><strong class="text-[#2A2F33]">Real-Time Leaderboards:</strong> High-throughput gaming leaderboards and financial scoring using Sorted Sets.</div>
+                            </div>
+                            <div class="p-2 neo-inset rounded flex items-start gap-2">
+                                <span class="material-symbols-outlined text-accent-purple text-[18px] flex-shrink-0 mt-0.5">sensors</span>
+                                <div><strong class="text-[#2A2F33]">Pub/Sub Event Streaming:</strong> Decoupled microservice communication channels and real-time push broadcasts.</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="p-4 neo-inset rounded-xl space-y-2">
+                        <h4 class="font-bold text-[#2A2F33] text-xs flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-accent-blue">psychology</span> What the Developer Thinks (Philosophy & Design Principles)
+                        </h4>
+                        <blockquote class="italic text-[11px] text-[#7E8490] border-l-2 border-accent-blue pl-3 my-2">
+                            "Software craftsmanship in data systems requires stripping away artificial complexity. Building a database is about deterministic execution, verifiable memory accounting, zero runtime bloat, and unwavering data safety."
+                        </blockquote>
+                        <div class="flex items-center justify-between pt-2 border-t border-[#C4C9D4]/30 text-[11px]">
+                            <span class="font-bold text-[#2A2F33]">Ashutosh Yadav — Lead Architect</span>
+                            <div class="flex items-center gap-3">
+                                <a href="https://ashutoshwork.space/" target="_blank" rel="noopener noreferrer" class="text-accent-blue hover:underline font-bold">ashutoshwork.space</a>
+                                <span>•</span>
+                                <a href="https://www.linkedin.com/in/ashutoshyadav256" target="_blank" rel="noopener noreferrer" class="text-accent-blue hover:underline font-bold">LinkedIn</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="flex justify-between items-center pt-3 border-t border-[#C4C9D4]/30 text-[11px] text-[#7E8490] flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <span>Direct Author Reach: <a href="mailto:ashutosh4tech@gmail.com" class="text-accent-blue font-bold hover:underline">ashutosh4tech@gmail.com</a></span>
+                    <span>•</span>
+                    <a href="https://github.com/Ashutosh-Yadav-256/RediForge" target="_blank" rel="noopener noreferrer" class="hover:text-accent-blue font-semibold">GitHub Source</a>
+                </div>
+                <button id="btn-close-arch-footer" class="neo-button neo-button-primary px-4 py-1.5 font-bold text-xs">Close Whitepaper</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-add-key" class="hidden neo-modal-backdrop">
+        <div class="neo-modal max-h-[85vh] overflow-y-auto p-4 sm:p-6 flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <h3 class="text-base sm:text-lg font-bold text-[#2A2F33] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-blue">add_circle</span> Add New Key
+                </h3>
+                <button id="btn-close-add-modal" class="text-[#7E8490] hover:text-accent-red"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="flex flex-col gap-3">
+                <div>
+                    <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Key Name</label>
+                    <input type="text" id="new-key-name" class="neo-inset w-full p-2 font-mono text-xs sm:text-sm" placeholder="e.g. user:1001" autocomplete="off"/>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Data Type</label>
+                        <select id="new-key-type" class="neo-inset w-full p-2 font-mono text-xs sm:text-sm bg-transparent">
+                            <option value="string">String</option>
+                            <option value="hash">Hash</option>
+                            <option value="list">List</option>
+                            <option value="set">Set</option>
+                            <option value="zset">Sorted Set</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">TTL (Sec, optional)</label>
+                        <input type="number" id="new-key-ttl" class="neo-inset w-full p-2 font-mono text-xs sm:text-sm" placeholder="No expiry"/>
+                    </div>
+                </div>
+                <div>
+                    <label id="new-key-val-label" class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Value</label>
+                    <textarea id="new-key-value" class="neo-inset w-full p-2 font-mono text-xs sm:text-sm h-24" placeholder="Enter string value..."></textarea>
+                    <p id="new-key-hint" class="text-[11px] text-[#7E8490] mt-1">For string values, enter raw text.</p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-[#C4C9D4]/30">
+                <button id="btn-cancel-add-key" class="neo-button px-4 py-2 text-xs sm:text-sm text-[#7E8490]">Cancel</button>
+                <button id="btn-save-add-key" class="neo-button neo-button-primary px-4 py-2 text-xs sm:text-sm font-bold">Create Key</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-edit-key" class="hidden neo-modal-backdrop">
+        <div class="neo-modal max-h-[85vh] overflow-y-auto p-4 sm:p-6 flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <h3 class="text-base sm:text-lg font-bold text-[#2A2F33] flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-blue">edit_note</span> Edit Key Value
+                </h3>
+                <button id="btn-close-edit-modal" class="text-[#7E8490] hover:text-accent-red transition-colors"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="flex flex-col gap-3">
+                <div>
+                    <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Key Name</label>
+                    <input type="text" id="edit-key-name" class="neo-inset w-full p-2 font-mono text-xs sm:text-sm bg-gray-100 opacity-80" readonly/>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-[#7E8490] uppercase block mb-1">Value</label>
+                    <textarea id="edit-key-value" class="neo-inset w-full p-2 font-mono text-xs sm:text-sm h-32" placeholder="Value..."></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-[#C4C9D4]/30">
+                <button id="btn-cancel-edit-key" class="neo-button px-4 py-2 text-xs sm:text-sm text-[#7E8490]">Cancel</button>
+                <button id="btn-save-edit-key" class="neo-button neo-button-primary px-4 py-2 text-xs sm:text-sm font-bold">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-confirm-danger" class="hidden neo-modal-backdrop">
+        <div class="neo-modal max-h-[85vh] overflow-y-auto p-4 sm:p-6 flex flex-col gap-4 border-l-4 border-accent-red">
+            <div class="flex justify-between items-center border-b border-[#C4C9D4]/30 pb-3">
+                <h3 class="text-base sm:text-lg font-bold text-accent-red flex items-center gap-2">
+                    <span class="material-symbols-outlined">warning</span> Dangerous Action Warning
+                </h3>
+                <button id="btn-close-danger-modal" class="text-[#7E8490] hover:text-accent-red transition-colors"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <p id="danger-modal-msg" class="text-xs sm:text-sm text-[#2A2F33] leading-relaxed">
+                You are about to execute a destructive command. This action cannot be undone. Are you sure you want to proceed?
+            </p>
+            <div class="flex justify-end gap-2 pt-2 border-t border-[#C4C9D4]/30">
+                <button id="btn-cancel-danger" class="neo-button px-4 py-2 text-xs sm:text-sm text-[#7E8490]">Cancel</button>
+                <button id="btn-proceed-danger" class="neo-button neo-button-danger px-4 py-2 text-xs sm:text-sm font-bold">Proceed & Execute</button>
+            </div>
+        </div>
+    </div>
+
     <div id="onboarding-overlay" class="hidden fixed inset-0 z-[100] pointer-events-none"></div>
     
     <div id="onboarding-modal" class="hidden fixed z-[101] neo-tooltip p-6 w-[350px] transition-all duration-300 pointer-events-auto flex flex-col gap-3">
@@ -259,9 +1416,7 @@
         </p>
         
         <div class="flex justify-between items-center mt-2">
-            <div id="onboarding-dots" class="flex gap-2">
-                <!-- Dots populated by JS -->
-            </div>
+            <div id="onboarding-dots" class="flex gap-2"></div>
             <div class="flex gap-2">
                 <button id="btn-onboarding-prev" class="neo-button px-3 py-1 text-xs text-[#7E8490] hidden">Back</button>
                 <button id="btn-onboarding-next" class="neo-button neo-button-primary px-3 py-1 text-xs tour-btn-highlight">Next</button>
@@ -269,6 +1424,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=5"></script>
+    <script src="/app.js?v=20260915_v22"></script>
 </body>
 </html>

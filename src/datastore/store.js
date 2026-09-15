@@ -9,14 +9,50 @@ var TYPE_SET = 'set';
 var TYPE_ZSET = 'zset';
 var TYPE_HASH = 'hash';
 
+function estimateMemory(key, value, type) {
+    var bytes = Buffer.byteLength(String(key)) + 48;
+    if (value === undefined || value === null) return bytes;
+
+    if (type === TYPE_STRING || typeof value === 'string') {
+        bytes += Buffer.byteLength(String(value)) + 16;
+    } else if (type === TYPE_HASH && value instanceof Map) {
+        bytes += 48;
+        for (var entry of value) {
+            bytes += Buffer.byteLength(String(entry[0])) + Buffer.byteLength(String(entry[1])) + 48;
+        }
+    } else if (type === TYPE_LIST && Array.isArray(value)) {
+        bytes += 48;
+        for (var i = 0; i < value.length; i++) {
+            bytes += Buffer.byteLength(String(value[i])) + 32;
+        }
+    } else if (type === TYPE_SET && value instanceof Set) {
+        bytes += 48;
+        for (var item of value) {
+            bytes += Buffer.byteLength(String(item)) + 32;
+        }
+    } else if (type === TYPE_ZSET && Array.isArray(value)) {
+        bytes += 48;
+        for (var j = 0; j < value.length; j++) {
+            var m = value[j];
+            bytes += Buffer.byteLength(String(m.member || '')) + 48;
+        }
+    } else {
+        bytes += 32;
+    }
+    return bytes;
+}
+
 function DataStore(dbCount, config) {
     this.dbCount = dbCount || 16;
     this._config = config || null;
     this._dbs = [];
     this._types = [];
+    this._keyMemories = [];
+    this._usedMemory = 0;
     for (var i = 0; i < this.dbCount; i++) {
         this._dbs.push(new Map());
         this._types.push(new Map());
+        this._keyMemories.push(new Map());
     }
     this.expiry = new ExpiryManager();
     this.lru = new LRUEviction(5);
@@ -26,12 +62,13 @@ function DataStore(dbCount, config) {
     this._restoring = false;
 }
 
+Object.defineProperty(DataStore.prototype, 'usedMemory', {
+    get: function () { return this._usedMemory; }
+});
+
 DataStore.prototype._checkExpired = function (db, key) {
     if (this.expiry.isExpired(db, key)) {
-        this._dbs[db].delete(key);
-        this._types[db].delete(key);
-        this.expiry.removeExpiry(db, key);
-        this.lru.remove(db, key);
+        this.deleteKey(db, key);
         return true;
     }
     return false;
@@ -47,12 +84,21 @@ DataStore.prototype.get = function (db, key) {
 };
 
 DataStore.prototype.set = function (db, key, value, type) {
+    var itemType = type || TYPE_STRING;
+    var newMem = estimateMemory(key, value, itemType);
+    var oldMem = this._keyMemories[db].get(key) || 0;
+    var memDelta = newMem - oldMem;
+
     if (!this._restoring && this._config) {
-        var rejected = this.enforceMemoryLimit();
+        var rejected = this.enforceMemoryLimit(memDelta);
         if (rejected) return false;
     }
+
     this._dbs[db].set(key, value);
-    this._types[db].set(key, type || TYPE_STRING);
+    this._types[db].set(key, itemType);
+    this._keyMemories[db].set(key, newMem);
+    this._usedMemory = Math.max(0, this._usedMemory + memDelta);
+
     this.lru.touch(db, key);
     if (!this._restoring) {
         this._dirty++;
@@ -62,6 +108,14 @@ DataStore.prototype.set = function (db, key, value, type) {
 };
 
 DataStore.prototype.markDirty = function (db, key) {
+    var val = this._dbs[db].get(key);
+    var type = this._types[db].get(key);
+    if (val !== undefined) {
+        var newMem = estimateMemory(key, val, type);
+        var oldMem = this._keyMemories[db].get(key) || 0;
+        this._usedMemory = Math.max(0, this._usedMemory + (newMem - oldMem));
+        this._keyMemories[db].set(key, newMem);
+    }
     this._dirty++;
     this._bumpKeyVersion(db, key);
     this.lru.touch(db, key);
@@ -72,6 +126,11 @@ DataStore.prototype.deleteKey = function (db, key) {
     this._types[db].delete(key);
     this.expiry.removeExpiry(db, key);
     this.lru.remove(db, key);
+
+    var oldMem = this._keyMemories[db].get(key) || 0;
+    this._keyMemories[db].delete(key);
+    this._usedMemory = Math.max(0, this._usedMemory - oldMem);
+
     if (existed) {
         this._dirty++;
         this._bumpKeyVersion(db, key);
@@ -110,8 +169,15 @@ DataStore.prototype.dbSize = function (db) {
 };
 
 DataStore.prototype.flushDb = function (db) {
+    var dbMem = 0;
+    for (var m of this._keyMemories[db].values()) {
+        dbMem += m;
+    }
+    this._usedMemory = Math.max(0, this._usedMemory - dbMem);
+
     this._dbs[db].clear();
     this._types[db].clear();
+    this._keyMemories[db].clear();
     this.expiry.clearDb(db);
     this.lru.clearDb(db);
     this._dirty++;
@@ -121,7 +187,9 @@ DataStore.prototype.flushAll = function () {
     for (var i = 0; i < this.dbCount; i++) {
         this._dbs[i].clear();
         this._types[i].clear();
+        this._keyMemories[i].clear();
     }
+    this._usedMemory = 0;
     this.expiry.clearAll();
     this.lru.clearAll();
     this._dirty++;
@@ -133,10 +201,16 @@ DataStore.prototype.swapDb = function (a, b) {
     }
     var tmpDb = this._dbs[a];
     var tmpType = this._types[a];
+    var tmpMem = this._keyMemories[a];
+
     this._dbs[a] = this._dbs[b];
     this._types[a] = this._types[b];
+    this._keyMemories[a] = this._keyMemories[b];
+
     this._dbs[b] = tmpDb;
     this._types[b] = tmpType;
+    this._keyMemories[b] = tmpMem;
+
     this.expiry.swapDb(a, b);
     this.lru.swapDb(a, b);
     return true;
@@ -166,26 +240,26 @@ DataStore.prototype.rename = function (db, from, to) {
     return true;
 };
 
-DataStore.prototype.enforceMemoryLimit = function () {
+DataStore.prototype.enforceMemoryLimit = function (incomingDelta) {
     if (!this._config) return false;
     var maxmem = this._config.get('maxmemory');
     if (!maxmem || maxmem <= 0) return false;
 
-    var used = process.memoryUsage().heapUsed;
-    if (used <= maxmem) return false;
+    var totalEstimated = this._usedMemory + (incomingDelta || 0);
+    if (totalEstimated <= maxmem) return false;
 
     var policy = this._config.get('maxmemory_policy') || 'noeviction';
     if (policy === 'noeviction') return true;
 
     var attempts = 0;
-    while (used > maxmem && attempts < 128) {
-        var freed = this.lru.evict(this, policy, used - maxmem);
+    while (this._usedMemory + (incomingDelta || 0) > maxmem && attempts < 128) {
+        var bytesNeeded = (this._usedMemory + (incomingDelta || 0)) - maxmem;
+        var freed = this.lru.evict(this, policy, bytesNeeded);
         if (!freed) return true;
-        used = process.memoryUsage().heapUsed;
         attempts++;
     }
 
-    return used > maxmem;
+    return (this._usedMemory + (incomingDelta || 0)) > maxmem;
 };
 
 Object.defineProperty(DataStore.prototype, 'dirty', {
@@ -247,8 +321,7 @@ DataStore.prototype.exportDbData = function (db) {
 
 DataStore.prototype.importDbData = function (db, data) {
     for (var key in data) {
-        this._dbs[db].set(key, data[key].value);
-        this._types[db].set(key, data[key].type);
+        this.set(db, key, data[key].value, data[key].type);
     }
 };
 

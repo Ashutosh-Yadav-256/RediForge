@@ -140,26 +140,27 @@ function cmdHincrby(args, ctx) {
     if (args.length !== 3) return encoder.wrongArgCount('hincrby');
     if (!ctx.store.checkType(ctx.db, args[0], TYPE_HASH)) return encoder.wrongType();
 
-    var increment = validate.strictParseInt(args[2]);
+    var increment = validate.strictParseBigInt(args[2]);
     if (increment === null) return encoder.encodeError('ERR value is not an integer or out of range');
 
     var map = ctx.store.get(ctx.db, args[0]);
     if (map === undefined) map = new Map();
 
     var current = map.get(args[1]);
+    var currentBig;
     if (current === undefined) {
-        current = 0;
+        currentBig = 0n;
     } else {
-        current = validate.strictParseInt(current);
-        if (current === null) return encoder.encodeError('ERR hash value is not an integer');
+        currentBig = validate.strictParseBigInt(current);
+        if (currentBig === null) return encoder.encodeError('ERR hash value is not an integer');
     }
 
-    var result = current + increment;
-    if (result > validate.INT_MAX || result < validate.INT_MIN) {
+    var result = currentBig + increment;
+    if (result > validate.INT64_MAX || result < validate.INT64_MIN) {
         return encoder.encodeError('ERR increment or decrement would overflow');
     }
 
-    map.set(args[1], String(result));
+    map.set(args[1], result.toString());
     ctx.store.set(ctx.db, args[0], map, TYPE_HASH);
 
     return encoder.integerReply(result);
