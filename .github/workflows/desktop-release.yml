@@ -11,7 +11,23 @@ permissions:
 
 jobs:
   build-and-release:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+            build-args: --win nsis --publish never
+            artifact: desktop/release/*.exe
+          - os: macos-latest
+            platform: mac
+            build-args: --mac dmg zip --publish never
+            artifact: desktop/release/*.dmg
+          - os: ubuntu-latest
+            platform: linux
+            build-args: --linux AppImage --publish never
+            artifact: desktop/release/*.AppImage
 
     steps:
       - name: Checkout repository
@@ -36,16 +52,19 @@ jobs:
         working-directory: desktop
         run: npm run build
 
-      - name: Package Desktop Installer (Windows NSIS)
+      - name: Package Desktop Installer (${{ matrix.platform }})
         working-directory: desktop
-        run: npx electron-builder --win nsis --publish never
+        run: npx electron-builder ${{ matrix.build-args }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Upload Release Asset to GitHub Releases
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: RediForge Desktop ${{ github.ref_name }}
-          files: desktop/release/*.exe
+          files: ${{ matrix.artifact }}
           generate_release_notes: true
           draft: false
           prerelease: false
