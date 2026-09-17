@@ -74,11 +74,11 @@ Unlike traditional web-based admin tools that require an intermediate HTTP or We
 ### 1. Key Browser & Editor
 - **SCAN-Based Pagination**: Efficiently browses millions of keys using cursor-based `SCAN` without blocking the server.
 - **Type Inspection**: Automatically detects and visually badges all 5 Redis data structures:
-  - 🔵 **Strings**: Raw and formatted payload viewer and inline editor.
-  - 🟢 **Lists**: Ordered sequence table (`LRANGE`, `LPUSH`, `RPUSH`, `LLEN`).
-  - 🟡 **Hashes**: Key-value field inspector with inline field editing and deletion (`HGETALL`, `HSET`, `HDEL`).
-  - 🟠 **Sets**: Member list manager with addition and removal (`SMEMBERS`, `SADD`, `SREM`).
-  - 🔴 **Sorted Sets**: Scored leaderboard table with score updates (`ZRANGE`, `ZADD`, `ZREM`).
+  - [String] **Strings**: Raw and formatted payload viewer and inline editor.
+  - [List] **Lists**: Ordered sequence table (`LRANGE`, `LPUSH`, `RPUSH`, `LLEN`).
+  - [Hash] **Hashes**: Key-value field inspector with inline field editing and deletion (`HGETALL`, `HSET`, `HDEL`).
+  - [Set] **Sets**: Member list manager with addition and removal (`SMEMBERS`, `SADD`, `SREM`).
+  - [ZSet] **Sorted Sets**: Scored leaderboard table with score updates (`ZRANGE`, `ZADD`, `ZREM`).
 - **Key Operations**: Live TTL inspection, setting/clearing expiration (`EXPIRE`, `PERSIST`), renaming (`RENAME`), and deletion (`DEL`).
 
 ### 2. Command Console (REPL)

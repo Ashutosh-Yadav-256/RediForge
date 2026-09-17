@@ -1,7 +1,3 @@
-/**
- * Metrics IPC Handlers — INFO polling, stats parsing, server info.
- */
-
 import { ipcMain, BrowserWindow } from 'electron';
 import { ConnectionManager } from '../connection-manager';
 
@@ -13,9 +9,6 @@ interface ParsedInfo {
   keyspace: Record<string, { keys: number; expires: number }>;
 }
 
-/**
- * Parse the INFO command output into structured sections.
- */
 function parseInfoResponse(raw: string): ParsedInfo {
   const info: ParsedInfo = {
     server: {},
@@ -44,7 +37,7 @@ function parseInfoResponse(raw: string): ParsedInfo {
     const value = trimmed.slice(colonIdx + 1);
 
     if (currentSection === 'keyspace') {
-      // Parse db0:keys=123,expires=0,avg_ttl=0
+
       const match = value.match(/keys=(\d+),expires=(\d+)/);
       if (match) {
         info.keyspace[key] = {
@@ -108,7 +101,7 @@ export function registerMetricsHandlers(
           }
         }
       } catch {
-        // Connection lost — stop polling
+
         if (metricsInterval) {
           clearInterval(metricsInterval);
           metricsInterval = null;

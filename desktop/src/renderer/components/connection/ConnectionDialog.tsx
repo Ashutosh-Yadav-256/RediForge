@@ -196,7 +196,7 @@ export const ConnectionDialog: React.FC<ConnectionDialogProps> = ({ onConnected,
                     onClick={(e) => handleDeleteProfile(e, p.id)}
                     title="Delete profile"
                   >
-                    ✕
+                    
                   </button>
                 </div>
               </div>
@@ -277,7 +277,7 @@ export const ConnectionDialog: React.FC<ConnectionDialogProps> = ({ onConnected,
 
             {error && (
               <div className="connection-dialog__error">
-                ✕ {error}
+                 {error}
               </div>
             )}
 

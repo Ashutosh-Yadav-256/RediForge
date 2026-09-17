@@ -27,7 +27,6 @@ const App: React.FC = () => {
     currentDb: 0,
   });
 
-  // Listen for connection status changes
   useEffect(() => {
     window.api.onConnectionStatusChanged((newStatus) => {
       setStatus(newStatus);
@@ -36,7 +35,6 @@ const App: React.FC = () => {
       }
     });
 
-    // Check initial status
     window.api.getConnectionStatus().then(setStatus);
   }, []);
 

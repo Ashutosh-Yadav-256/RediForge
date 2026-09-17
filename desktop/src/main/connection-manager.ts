@@ -1,9 +1,3 @@
-/**
- * Connection Manager — Manages multiple named RESP2 connections.
- * Persists connection profiles, tracks active connection,
- * and provides the bridge between IPC handlers and the RESP2 client.
- */
-
 import { Resp2Client, Resp2ClientOptions } from './resp2/client';
 import { RespValue } from './resp2/parser';
 import { SecureStore } from './store';
@@ -46,11 +40,8 @@ export class ConnectionManager {
     }
   }
 
-  /**
-   * Connect to a RediForge server using the given profile.
-   */
   async connect(profile: ConnectionProfile): Promise<{ success: boolean; error?: string }> {
-    // Disconnect existing connection
+
     if (this._client) {
       this.disconnect();
     }
@@ -66,7 +57,6 @@ export class ConnectionManager {
     this._client = new Resp2Client(options);
     this._activeProfile = profile;
 
-    // Wire up events
     this._client.on('connect', () => {
       this._notifyStatus();
     });
@@ -103,9 +93,6 @@ export class ConnectionManager {
     }
   }
 
-  /**
-   * Disconnect the active connection.
-   */
   disconnect(): void {
     if (this._client) {
       this._client.disconnect();
@@ -115,9 +102,6 @@ export class ConnectionManager {
     this._notifyStatus();
   }
 
-  /**
-   * Execute a command on the active connection.
-   */
   async execute(cmd: string, ...args: string[]): Promise<RespValue> {
     if (!this._client || !this._client.ready) {
       throw new Error('Not connected');
@@ -125,9 +109,6 @@ export class ConnectionManager {
     return this._client.sendCommand(cmd, ...args);
   }
 
-  /**
-   * Execute a command from an array.
-   */
   async executeArray(parts: string[]): Promise<RespValue> {
     if (!this._client || !this._client.ready) {
       throw new Error('Not connected');
@@ -135,9 +116,6 @@ export class ConnectionManager {
     return this._client.sendCommandArray(parts);
   }
 
-  /**
-   * Switch to a different database.
-   */
   async selectDb(index: number): Promise<void> {
     if (!this._client || !this._client.ready) {
       throw new Error('Not connected');
@@ -145,9 +123,6 @@ export class ConnectionManager {
     await this._client.selectDb(index);
   }
 
-  /**
-   * Get the current connection status.
-   */
   getStatus(): ConnectionStatus {
     return {
       connected: this._client?.connected || false,
@@ -160,23 +135,14 @@ export class ConnectionManager {
     };
   }
 
-  /**
-   * Register a status change listener.
-   */
   onStatusChange(listener: (status: ConnectionStatus) => void): void {
     this._statusListeners.push(listener);
   }
 
-  /**
-   * Register an unsolicited message listener (for pub/sub).
-   */
   onMessage(listener: (msg: RespValue) => void): void {
     this._messageListeners.push(listener);
   }
 
-  /**
-   * Connection profile management.
-   */
   saveProfile(profile: ConnectionProfile): void {
     this._profiles.set(profile.id, profile);
     try {

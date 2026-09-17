@@ -107,12 +107,12 @@ export const TransactionBuilder: React.FC = () => {
           color: 'var(--accent-rose)',
           fontSize: 'var(--text-sm)',
         }}>
-          ✕ {error}
+           {error}
         </div>
       )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-lg)' }}>
-        {/* Controls */}
+        {}
         <div className="card">
           <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, marginBottom: 'var(--space-md)', color: 'var(--text-secondary)' }}>
             Transaction Controls
@@ -133,7 +133,7 @@ export const TransactionBuilder: React.FC = () => {
           </div>
         </div>
 
-        {/* Watch Keys */}
+        {}
         <div className="card">
           <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, marginBottom: 'var(--space-md)', color: 'var(--text-secondary)' }}>
             Watch Keys
@@ -155,7 +155,7 @@ export const TransactionBuilder: React.FC = () => {
             <div style={{ marginTop: 'var(--space-sm)', display: 'flex', flexWrap: 'wrap', gap: 'var(--space-xs)' }}>
               {watchedKeys.map(k => (
                 <span key={k} className="badge badge-amber" style={{ fontFamily: 'var(--font-mono)' }}>
-                  👁 {k}
+                   {k}
                 </span>
               ))}
             </div>
@@ -163,7 +163,7 @@ export const TransactionBuilder: React.FC = () => {
         </div>
       </div>
 
-      {/* Command Queue */}
+      {}
       {inTransaction && (
         <div className="card">
           <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, marginBottom: 'var(--space-md)', color: 'var(--text-secondary)' }}>
@@ -203,11 +203,11 @@ export const TransactionBuilder: React.FC = () => {
         </div>
       )}
 
-      {/* Result */}
+      {}
       {result !== null && (
         <div className="card">
           <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, marginBottom: 'var(--space-md)', color: 'var(--accent-emerald)' }}>
-            ✓ Transaction Result
+             Transaction Result
           </h3>
           <pre className="selectable mono" style={{
             background: 'var(--bg-tertiary)',

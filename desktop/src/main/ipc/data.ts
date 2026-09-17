@@ -1,12 +1,8 @@
-/**
- * Data IPC Handlers — Type-specific data operations for all 5 data structures.
- */
-
 import { ipcMain } from 'electron';
 import { ConnectionManager } from '../connection-manager';
 
 export function registerDataHandlers(manager: ConnectionManager): void {
-  // ─── String ───────────────────────────────
+
   ipcMain.handle('data:string:get', async (_event, key: string) => {
     return manager.execute('GET', key);
   });
@@ -15,7 +11,6 @@ export function registerDataHandlers(manager: ConnectionManager): void {
     return manager.execute('SET', key, value);
   });
 
-  // ─── List ─────────────────────────────────
   ipcMain.handle('data:list:range', async (_event, key: string, start: number, stop: number) => {
     return manager.execute('LRANGE', key, String(start), String(stop));
   });
@@ -40,10 +35,9 @@ export function registerDataHandlers(manager: ConnectionManager): void {
     return manager.execute('LREM', key, String(count), value);
   });
 
-  // ─── Hash ─────────────────────────────────
   ipcMain.handle('data:hash:getall', async (_event, key: string) => {
     const result = await manager.execute('HGETALL', key);
-    // HGETALL returns flat [field, value, field, value, ...]
+
     if (Array.isArray(result)) {
       const obj: Record<string, string> = {};
       for (let i = 0; i < result.length; i += 2) {
@@ -66,7 +60,6 @@ export function registerDataHandlers(manager: ConnectionManager): void {
     return manager.execute('HLEN', key);
   });
 
-  // ─── Set ──────────────────────────────────
   ipcMain.handle('data:set:members', async (_event, key: string) => {
     return manager.execute('SMEMBERS', key);
   });
@@ -83,7 +76,6 @@ export function registerDataHandlers(manager: ConnectionManager): void {
     return manager.execute('SCARD', key);
   });
 
-  // ─── Sorted Set ───────────────────────────
   ipcMain.handle('data:zset:range', async (_event, key: string, start: number, stop: number, withScores: boolean) => {
     const args = ['ZRANGE', key, String(start), String(stop)];
     if (withScores) args.push('WITHSCORES');
@@ -106,7 +98,6 @@ export function registerDataHandlers(manager: ConnectionManager): void {
     return manager.execute('ZSCORE', key, member);
   });
 
-  // ─── Generic key value fetch (auto-detects type) ──
   ipcMain.handle('data:get-value', async (_event, key: string, type: string) => {
     switch (type) {
       case 'string': return manager.execute('GET', key);

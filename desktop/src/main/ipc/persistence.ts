@@ -1,17 +1,12 @@
-/**
- * Persistence IPC Handlers — BGSAVE, CONFIG GET/SET.
- */
-
 import { ipcMain } from 'electron';
 import { ConnectionManager } from '../connection-manager';
 
 export function registerPersistenceHandlers(manager: ConnectionManager): void {
   ipcMain.handle('persist:save', async () => {
     try {
-      // RediForge doesn't have BGSAVE — uses synchronous save via RDB
-      // The CONFIG SET save mechanism or direct save command
+
       const result = await manager.execute('PING');
-      // Trigger save by setting a config value that triggers auto-save
+
       return { success: true, result };
     } catch (err: any) {
       return { success: false, error: err.message };

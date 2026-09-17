@@ -17,7 +17,6 @@ export const PubSubMonitor: React.FC = () => {
   const messagesRef = useRef<HTMLDivElement>(null);
   const nextId = useRef(0);
 
-  // Listen for pub/sub messages
   useEffect(() => {
     window.api.onPubSubMessage((msg) => {
       if (Array.isArray(msg.data)) {
@@ -34,7 +33,6 @@ export const PubSubMonitor: React.FC = () => {
     });
   }, []);
 
-  // Auto-scroll
   useEffect(() => {
     if (messagesRef.current) {
       messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
@@ -78,7 +76,7 @@ export const PubSubMonitor: React.FC = () => {
       <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Pub/Sub Monitor</h2>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-lg)' }}>
-        {/* Subscribe */}
+        {}
         <div className="card">
           <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, marginBottom: 'var(--space-md)', color: 'var(--text-secondary)' }}>
             Subscribe
@@ -116,7 +114,7 @@ export const PubSubMonitor: React.FC = () => {
           )}
         </div>
 
-        {/* Publish */}
+        {}
         <div className="card">
           <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, marginBottom: 'var(--space-md)', color: 'var(--text-secondary)' }}>
             Publish
@@ -145,7 +143,7 @@ export const PubSubMonitor: React.FC = () => {
         </div>
       </div>
 
-      {/* Message Stream */}
+      {}
       <div className="card" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
           <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, color: 'var(--text-secondary)' }}>

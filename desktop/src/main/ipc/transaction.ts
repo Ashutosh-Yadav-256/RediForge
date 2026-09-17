@@ -1,7 +1,3 @@
-/**
- * Transaction IPC Handlers — MULTI/EXEC/DISCARD/WATCH.
- */
-
 import { ipcMain } from 'electron';
 import { ConnectionManager } from '../connection-manager';
 
@@ -53,7 +49,7 @@ export function registerTransactionHandlers(manager: ConnectionManager): void {
 
   ipcMain.handle('tx:queue-command', async (_event, parts: string[]) => {
     try {
-      // When inside MULTI, commands are queued and return QUEUED
+
       const result = await manager.executeArray(parts);
       return { success: true, result };
     } catch (err: any) {

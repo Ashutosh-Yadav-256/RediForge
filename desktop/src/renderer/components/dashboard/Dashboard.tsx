@@ -51,20 +51,18 @@ export const Dashboard: React.FC = () => {
           uptime: parseInt(data.server?.uptime_in_seconds || '0', 10),
         };
         const updated = [...prev, snapshot];
-        // Keep 5 minutes of data (150 points at 2s intervals)
+
         return updated.slice(-150);
       });
     }
   }, []);
 
-  // Poll every 2 seconds
   useEffect(() => {
     fetchInfo();
     const timer = setInterval(fetchInfo, 2000);
     return () => clearInterval(timer);
   }, [fetchInfo]);
 
-  // Draw memory chart
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || history.length < 2) return;
@@ -84,14 +82,12 @@ export const Dashboard: React.FC = () => {
     const chartW = w - padding.left - padding.right;
     const chartH = h - padding.top - padding.bottom;
 
-    // Clear
     ctx.clearRect(0, 0, w, h);
 
     const memValues = history.map(s => s.memoryUsed);
     const maxMem = Math.max(...memValues, 1);
     const minMem = Math.min(...memValues);
 
-    // Grid lines
     ctx.strokeStyle = 'rgba(255,255,255,0.05)';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
@@ -101,7 +97,6 @@ export const Dashboard: React.FC = () => {
       ctx.lineTo(w - padding.right, y);
       ctx.stroke();
 
-      // Label
       ctx.fillStyle = 'rgba(255,255,255,0.3)';
       ctx.font = '10px Inter, sans-serif';
       ctx.textAlign = 'right';
@@ -109,12 +104,10 @@ export const Dashboard: React.FC = () => {
       ctx.fillText(formatBytes(val), padding.left - 6, y + 4);
     }
 
-    // Gradient fill
     const gradient = ctx.createLinearGradient(0, padding.top, 0, h - padding.bottom);
     gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
     gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)');
 
-    // Line
     ctx.beginPath();
     ctx.strokeStyle = '#3b82f6';
     ctx.lineWidth = 2;
@@ -130,7 +123,6 @@ export const Dashboard: React.FC = () => {
     }
     ctx.stroke();
 
-    // Fill area
     ctx.lineTo(padding.left + chartW, padding.top + chartH);
     ctx.lineTo(padding.left, padding.top + chartH);
     ctx.closePath();
@@ -138,7 +130,6 @@ export const Dashboard: React.FC = () => {
     ctx.fill();
   }, [history]);
 
-  // Draw keyspace bar chart
   useEffect(() => {
     const canvas = keysCanvasRef.current;
     if (!canvas || !info) return;
@@ -183,7 +174,6 @@ export const Dashboard: React.FC = () => {
       const barH = (data.keys / maxKeys) * chartH;
       const y = padding.top + chartH - barH;
 
-      // Bar with gradient
       const grad = ctx.createLinearGradient(x, y, x, padding.top + chartH);
       grad.addColorStop(0, colors[i % colors.length]);
       grad.addColorStop(1, colors[i % colors.length] + '40');
@@ -193,13 +183,11 @@ export const Dashboard: React.FC = () => {
       ctx.roundRect(x, y, barWidth, barH, [4, 4, 0, 0]);
       ctx.fill();
 
-      // Label
       ctx.fillStyle = 'rgba(255,255,255,0.4)';
       ctx.font = '10px Inter, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(dbName, x + barWidth / 2, padding.top + chartH + 16);
 
-      // Value on top
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
       ctx.fillText(String(data.keys), x + barWidth / 2, y - 6);
     });
@@ -226,7 +214,7 @@ export const Dashboard: React.FC = () => {
         </span>
       </div>
 
-      {/* Metric Cards */}
+      {}
       <div className="dashboard__cards">
         <div className="metric-card metric-card--accent-blue">
           <div className="metric-card__label">Memory Used</div>
@@ -260,7 +248,7 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Charts */}
+      {}
       <div className="dashboard__charts">
         <div className="chart-container">
           <div className="chart-container__title">Memory Usage Over Time</div>
@@ -272,7 +260,7 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Server Info */}
+      {}
       {info && (
         <div className="card">
           <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, marginBottom: 'var(--space-md)', color: 'var(--text-secondary)' }}>

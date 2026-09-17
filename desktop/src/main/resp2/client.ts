@@ -1,15 +1,3 @@
-/**
- * RESP2 TCP Client — Connects to a RediForge server over raw TCP,
- * sends RESP2-encoded commands, and parses responses.
- * 
- * Features:
- * - Promise-based sendCommand() with sequential request queue
- * - Auto-reconnect with exponential backoff
- * - AUTH on connect if password provided
- * - SELECT for database switching
- * - Event-driven lifecycle (connect, disconnect, error, ready)
- */
-
 import * as net from 'net';
 import { EventEmitter } from 'events';
 import { RespParser, RespValue } from './parser';
@@ -62,9 +50,6 @@ export class Resp2Client extends EventEmitter {
   get ready(): boolean { return this._ready; }
   get currentDb(): number { return this._currentDb; }
 
-  /**
-   * Connect to the RediForge server.
-   */
   async connect(): Promise<void> {
     if (this._connected) return;
 
@@ -84,7 +69,7 @@ export class Resp2Client extends EventEmitter {
         this.emit('connect');
 
         try {
-          // AUTH if password is set
+
           if (this._options.password) {
             const authResult = await this._sendRaw(['AUTH', this._options.password]);
             if (authResult instanceof Error) {
@@ -92,7 +77,6 @@ export class Resp2Client extends EventEmitter {
             }
           }
 
-          // SELECT database if not default
           if (this._options.db && this._options.db > 0) {
             const selectResult = await this._sendRaw(['SELECT', String(this._options.db)]);
             if (selectResult instanceof Error) {
@@ -127,7 +111,6 @@ export class Resp2Client extends EventEmitter {
         this._connected = false;
         this._ready = false;
 
-        // Reject all pending requests
         for (const pending of this._queue) {
           pending.reject(new Error('Connection closed'));
         }
@@ -145,9 +128,6 @@ export class Resp2Client extends EventEmitter {
     });
   }
 
-  /**
-   * Disconnect from the server.
-   */
   disconnect(): void {
     this._destroyed = true;
     this._ready = false;
@@ -167,7 +147,6 @@ export class Resp2Client extends EventEmitter {
 
     this._connected = false;
 
-    // Reject pending
     for (const pending of this._queue) {
       pending.reject(new Error('Client disconnected'));
     }
@@ -175,23 +154,14 @@ export class Resp2Client extends EventEmitter {
     this._parser.reset();
   }
 
-  /**
-   * Send a command and get the response.
-   */
   async sendCommand(cmd: string, ...args: string[]): Promise<RespValue> {
     return this._sendRaw([cmd, ...args]);
   }
 
-  /**
-   * Send a command from an array.
-   */
   async sendCommandArray(parts: string[]): Promise<RespValue> {
     return this._sendRaw(parts);
   }
 
-  /**
-   * Switch to a different database.
-   */
   async selectDb(index: number): Promise<void> {
     const result = await this.sendCommand('SELECT', String(index));
     if (result instanceof Error) {
@@ -200,9 +170,6 @@ export class Resp2Client extends EventEmitter {
     this._currentDb = index;
   }
 
-  /**
-   * Internal: send raw command and wait for response.
-   */
   private _sendRaw(parts: string[]): Promise<RespValue> {
     return new Promise<RespValue>((resolve, reject) => {
       if (!this._socket || this._socket.destroyed) {
@@ -224,9 +191,6 @@ export class Resp2Client extends EventEmitter {
     });
   }
 
-  /**
-   * Handle incoming data from the TCP socket.
-   */
   private _onData(data: Buffer): void {
     try {
       this._parser.append(data);
@@ -237,7 +201,7 @@ export class Resp2Client extends EventEmitter {
         if (pending) {
           pending.resolve(result);
         } else {
-          // Unsolicited message (e.g., pub/sub)
+
           this.emit('message', result);
         }
       }
@@ -246,9 +210,6 @@ export class Resp2Client extends EventEmitter {
     }
   }
 
-  /**
-   * Schedule a reconnection attempt with exponential backoff.
-   */
   private _scheduleReconnect(): void {
     if (this._destroyed) return;
 
@@ -264,11 +225,11 @@ export class Resp2Client extends EventEmitter {
       this._reconnectTimer = null;
       if (this._destroyed) return;
 
-      this._destroyed = false; // Reset for reconnect
+      this._destroyed = false;
       try {
         await this.connect();
       } catch {
-        // Will trigger another reconnect via the close handler
+
       }
     }, delay);
   }

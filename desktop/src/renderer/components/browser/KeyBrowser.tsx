@@ -58,7 +58,6 @@ export const KeyBrowser: React.FC = () => {
     }
   }, [searchPattern]);
 
-  // Initial load
   useEffect(() => {
     loadKeys(0);
   }, [loadKeys]);
@@ -225,7 +224,7 @@ export const KeyBrowser: React.FC = () => {
 
   return (
     <div className="key-browser">
-      {/* Key List Panel */}
+      {}
       <div className="key-browser__list">
         <div className="key-browser__search">
           <input
@@ -279,7 +278,7 @@ export const KeyBrowser: React.FC = () => {
         </div>
       </div>
 
-      {/* Key Detail Panel */}
+      {}
       <div className="key-browser__detail">
         {selectedKey && (
           <div className="key-browser__detail-header">

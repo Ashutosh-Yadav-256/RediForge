@@ -1,7 +1,3 @@
-/**
- * Connection IPC Handlers — Connect, disconnect, auth, status.
- */
-
 import { ipcMain, BrowserWindow } from 'electron';
 import { ConnectionManager, ConnectionProfile } from '../connection-manager';
 
@@ -36,7 +32,6 @@ export function registerConnectionHandlers(
     return manager.getProfiles();
   });
 
-  // Push status changes to renderer
   manager.onStatusChange((status) => {
     const win = getMainWindow();
     if (win && !win.isDestroyed()) {

@@ -1,12 +1,7 @@
-/**
- * Console IPC Handlers — Free-form command execution.
- */
-
 import { ipcMain } from 'electron';
 import { ConnectionManager } from '../connection-manager';
 import { RespValue } from '../resp2/parser';
 
-/** All 93 commands from the RediForge registry, for autocomplete */
 const COMMAND_LIST = [
   'SET', 'GET', 'MGET', 'MSET', 'SETNX', 'GETDEL', 'INCR', 'DECR',
   'INCRBY', 'DECRBY', 'INCRBYFLOAT', 'APPEND', 'STRLEN', 'GETRANGE',
@@ -29,7 +24,6 @@ const COMMAND_LIST = [
   'AUTH',
 ];
 
-/** Commands that modify data — blocked in safe mode */
 const WRITE_COMMANDS = new Set([
   'SET', 'SETNX', 'GETDEL', 'INCR', 'DECR', 'INCRBY', 'DECRBY',
   'INCRBYFLOAT', 'APPEND', 'MSET',
@@ -42,9 +36,6 @@ const WRITE_COMMANDS = new Set([
   'FLUSHDB', 'FLUSHALL', 'SWAPDB',
 ]);
 
-/**
- * Parse a raw command string into parts, handling quoted strings.
- */
 function parseCommandString(input: string): string[] {
   const parts: string[] = [];
   let current = '';

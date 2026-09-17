@@ -23,19 +23,16 @@ export const CommandConsole: React.FC = () => {
   const nextId = useRef(0);
   const history = useRef<string[]>([]);
 
-  // Load command list on mount
   useEffect(() => {
     window.api.getCommandList().then(setCommandList);
   }, []);
 
-  // Auto-scroll
   useEffect(() => {
     if (outputRef.current) {
       outputRef.current.scrollTop = outputRef.current.scrollHeight;
     }
   }, [entries]);
 
-  // Filter autocomplete
   useEffect(() => {
     if (!input.trim()) {
       setShowAutocomplete(false);
@@ -106,7 +103,7 @@ export const CommandConsole: React.FC = () => {
         setAutocompleteIndex(prev => Math.max(0, prev - 1));
         return;
       }
-      // History navigation
+
       const h = history.current;
       if (h.length === 0) return;
       const newIdx = historyIndex === -1 ? h.length - 1 : Math.max(0, historyIndex - 1);
@@ -157,7 +154,7 @@ export const CommandConsole: React.FC = () => {
             id="safe-mode"
           />
           <label htmlFor="safe-mode" style={{ cursor: 'pointer' }}>
-            Safe Mode {safeMode ? '🔒' : '🔓'}
+            Safe Mode {safeMode ? '' : ''}
           </label>
         </div>
       </div>

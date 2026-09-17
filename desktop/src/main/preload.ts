@@ -1,13 +1,7 @@
-/**
- * Preload Script — Exposes a typed, sandboxed API to the renderer via contextBridge.
- * This is the ONLY surface area between the UI and Node.js.
- * nodeIntegration: false, contextIsolation: true.
- */
-
 import { contextBridge, ipcRenderer } from 'electron';
 
 const api = {
-  // ─── Connection ─────────────────────────────
+
   connect: (profile: any) => ipcRenderer.invoke('conn:connect', profile),
   disconnect: () => ipcRenderer.invoke('conn:disconnect'),
   getConnectionStatus: () => ipcRenderer.invoke('conn:status'),
@@ -18,7 +12,6 @@ const api = {
     ipcRenderer.on('conn:status-changed', (_event, status) => callback(status));
   },
 
-  // ─── Key Browser ────────────────────────────
   scanKeys: (cursor: number, match: string, count: number) =>
     ipcRenderer.invoke('keys:scan', cursor, match, count),
   getKeyType: (key: string) => ipcRenderer.invoke('keys:type', key),
@@ -28,7 +21,6 @@ const api = {
   setKeyTTL: (key: string, seconds: number) => ipcRenderer.invoke('keys:expire', key, seconds),
   persistKey: (key: string) => ipcRenderer.invoke('keys:persist', key),
 
-  // ─── Data (type-specific) ───────────────────
   getKeyValue: (key: string, type: string) => ipcRenderer.invoke('data:get-value', key, type),
   stringGet: (key: string) => ipcRenderer.invoke('data:string:get', key),
   stringSet: (key: string, value: string) => ipcRenderer.invoke('data:string:set', key, value),
@@ -50,12 +42,10 @@ const api = {
     ipcRenderer.invoke('data:zset:add', key, score, member),
   zsetRem: (key: string, ...members: string[]) => ipcRenderer.invoke('data:zset:rem', key, ...members),
 
-  // ─── Console ────────────────────────────────
   executeCommand: (commandStr: string, safeMode: boolean) =>
     ipcRenderer.invoke('console:execute', commandStr, safeMode),
   getCommandList: () => ipcRenderer.invoke('console:command-list'),
 
-  // ─── Metrics ────────────────────────────────
   getServerInfo: () => ipcRenderer.invoke('metrics:info'),
   getDbSize: (db?: number) => ipcRenderer.invoke('metrics:dbsize', db),
   startMetricsPolling: (intervalMs: number) => ipcRenderer.invoke('metrics:start-polling', intervalMs),
@@ -64,7 +54,6 @@ const api = {
     ipcRenderer.on('metrics:update', (_event, data) => callback(data));
   },
 
-  // ─── Persistence & Config ───────────────────
   triggerSave: () => ipcRenderer.invoke('persist:save'),
   configGet: (key: string) => ipcRenderer.invoke('persist:config-get', key),
   configGetAll: () => ipcRenderer.invoke('persist:config-get-all'),
@@ -72,7 +61,6 @@ const api = {
   selectDb: (index: number) => ipcRenderer.invoke('persist:select-db', index),
   swapDb: (a: number, b: number) => ipcRenderer.invoke('persist:swapdb', a, b),
 
-  // ─── Pub/Sub ────────────────────────────────
   subscribe: (channel: string) => ipcRenderer.invoke('pubsub:subscribe', channel),
   unsubscribe: (channel: string) => ipcRenderer.invoke('pubsub:unsubscribe', channel),
   publish: (channel: string, message: string) => ipcRenderer.invoke('pubsub:publish', channel, message),
@@ -80,7 +68,6 @@ const api = {
     ipcRenderer.on('pubsub:message', (_event, msg) => callback(msg));
   },
 
-  // ─── Transactions ──────────────────────────
   txMulti: () => ipcRenderer.invoke('tx:multi'),
   txExec: () => ipcRenderer.invoke('tx:exec'),
   txDiscard: () => ipcRenderer.invoke('tx:discard'),
@@ -88,7 +75,6 @@ const api = {
   txUnwatch: () => ipcRenderer.invoke('tx:unwatch'),
   txQueueCommand: (parts: string[]) => ipcRenderer.invoke('tx:queue-command', parts),
 
-  // ─── Window Controls & App Info ─────────────
   minimizeWindow: () => ipcRenderer.invoke('window:minimize'),
   maximizeWindow: () => ipcRenderer.invoke('window:maximize'),
   closeWindow: () => ipcRenderer.invoke('window:close'),

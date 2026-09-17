@@ -80,11 +80,11 @@ export const PersistencePanel: React.FC = () => {
           background: status.type === 'success' ? 'var(--accent-emerald-dim)' : 'var(--accent-rose-dim)',
           color: status.type === 'success' ? 'var(--accent-emerald)' : 'var(--accent-rose)',
         }}>
-          {status.type === 'success' ? '✓' : '✕'} {status.message}
+          {status.type === 'success' ? '' : ''} {status.message}
         </div>
       )}
 
-      {/* Database Selector */}
+      {}
       <div className="card">
         <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, marginBottom: 'var(--space-md)', color: 'var(--text-secondary)' }}>
           Database Selection
@@ -103,7 +103,7 @@ export const PersistencePanel: React.FC = () => {
         </div>
       </div>
 
-      {/* Persistence Status */}
+      {}
       <div className="card">
         <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, marginBottom: 'var(--space-md)', color: 'var(--text-secondary)' }}>
           Persistence Status
@@ -136,12 +136,12 @@ export const PersistencePanel: React.FC = () => {
         </div>
         <div style={{ marginTop: 'var(--space-lg)' }}>
           <button className="btn-primary btn-sm" onClick={() => window.api.triggerSave()}>
-            💾 Trigger Snapshot
+             Trigger Snapshot
           </button>
         </div>
       </div>
 
-      {/* Runtime Config */}
+      {}
       <div className="card">
         <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, marginBottom: 'var(--space-md)', color: 'var(--text-secondary)' }}>
           Runtime Configuration

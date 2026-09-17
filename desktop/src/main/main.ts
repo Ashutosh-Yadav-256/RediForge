@@ -1,13 +1,3 @@
-/**
- * Electron Main Process Entry Point
- * 
- * Creates the application window, registers all IPC handlers,
- * and manages the app lifecycle.
- * 
- * Security: nodeIntegration disabled, contextIsolation enabled,
- * all server communication routed through main process.
- */
-
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import * as path from 'path';
 import { ConnectionManager } from './connection-manager';
@@ -38,7 +28,7 @@ function createWindow(): void {
     y: savedState.y,
     minWidth: 1000,
     minHeight: 700,
-    frame: false, // Frameless for custom title bar
+    frame: false,
     titleBarStyle: 'hidden',
     backgroundColor: '#0a0e1a',
     icon: path.join(__dirname, '../../assets/icon.png'),
@@ -46,12 +36,11 @@ function createWindow(): void {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
-      sandbox: false, // Needed for preload to use require
+      sandbox: false,
     },
     show: false,
   });
 
-  // Graceful show after ready
   mainWindow.once('ready-to-show', () => {
     if (savedState.isMaximized) {
       mainWindow?.maximize();
@@ -84,7 +73,6 @@ function createWindow(): void {
   mainWindow.on('move', saveWindowState);
   mainWindow.on('close', saveWindowState);
 
-  // Load the renderer
   if (process.env.NODE_ENV === 'development' || process.argv.includes('--dev')) {
     mainWindow.loadURL('http://localhost:5173');
     mainWindow.webContents.openDevTools({ mode: 'detach' });
@@ -92,7 +80,6 @@ function createWindow(): void {
     mainWindow.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
   }
 
-  // Open external links in the system browser
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
@@ -103,7 +90,6 @@ function createWindow(): void {
   });
 }
 
-// ─── Window Control IPC ─────────────────────
 function registerWindowHandlers(): void {
   ipcMain.handle('window:minimize', () => {
     mainWindow?.minimize();
@@ -134,9 +120,8 @@ function registerWindowHandlers(): void {
   });
 }
 
-// ─── App Lifecycle ──────────────────────────
 app.whenReady().then(() => {
-  // Register all IPC handlers
+
   registerWindowHandlers();
   registerConnectionHandlers(connectionManager, getMainWindow);
   registerKeysHandlers(connectionManager);

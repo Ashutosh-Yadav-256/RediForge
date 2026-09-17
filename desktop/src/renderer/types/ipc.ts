@@ -1,7 +1,3 @@
-/**
- * IPC Type Declarations — Type-safe window.api for the renderer.
- */
-
 export interface ConnectionProfile {
   id: string;
   name: string;
@@ -53,7 +49,7 @@ export interface MetricsUpdate {
 declare global {
   interface Window {
     api: {
-      // Connection
+
       connect(profile: ConnectionProfile): Promise<ConnectResult>;
       disconnect(): Promise<void>;
       getConnectionStatus(): Promise<ConnectionStatus>;
@@ -62,7 +58,6 @@ declare global {
       getSavedConnections(): Promise<ConnectionProfile[]>;
       onConnectionStatusChanged(callback: (status: ConnectionStatus) => void): void;
 
-      // Key Browser
       scanKeys(cursor: number, match: string, count: number): Promise<ScanResult>;
       getKeyType(key: string): Promise<string>;
       getKeyTTL(key: string): Promise<number>;
@@ -71,7 +66,6 @@ declare global {
       setKeyTTL(key: string, seconds: number): Promise<void>;
       persistKey(key: string): Promise<void>;
 
-      // Data
       getKeyValue(key: string, type: string): Promise<any>;
       stringGet(key: string): Promise<string | null>;
       stringSet(key: string, value: string): Promise<any>;
@@ -89,18 +83,15 @@ declare global {
       zsetAdd(key: string, score: number, member: string): Promise<number>;
       zsetRem(key: string, ...members: string[]): Promise<number>;
 
-      // Console
       executeCommand(commandStr: string, safeMode: boolean): Promise<ConsoleResult>;
       getCommandList(): Promise<string[]>;
 
-      // Metrics
       getServerInfo(): Promise<ServerInfo | null>;
       getDbSize(db?: number): Promise<number>;
       startMetricsPolling(intervalMs: number): Promise<any>;
       stopMetricsPolling(): Promise<any>;
       onMetricsUpdate(callback: (data: MetricsUpdate) => void): void;
 
-      // Persistence
       triggerSave(): Promise<any>;
       configGet(key: string): Promise<any>;
       configGetAll(): Promise<Record<string, string>>;
@@ -108,13 +99,11 @@ declare global {
       selectDb(index: number): Promise<any>;
       swapDb(a: number, b: number): Promise<any>;
 
-      // Pub/Sub
       subscribe(channel: string): Promise<any>;
       unsubscribe(channel: string): Promise<any>;
       publish(channel: string, message: string): Promise<any>;
       onPubSubMessage(callback: (msg: any) => void): void;
 
-      // Transactions
       txMulti(): Promise<any>;
       txExec(): Promise<any>;
       txDiscard(): Promise<any>;
@@ -122,7 +111,6 @@ declare global {
       txUnwatch(): Promise<any>;
       txQueueCommand(parts: string[]): Promise<any>;
 
-      // Window & App Info
       minimizeWindow(): Promise<void>;
       maximizeWindow(): Promise<void>;
       closeWindow(): Promise<void>;

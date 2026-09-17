@@ -1,7 +1,3 @@
-/**
- * Keys IPC Handlers — SCAN, TYPE, TTL, DEL, RENAME, PERSIST.
- */
-
 import { ipcMain } from 'electron';
 import { ConnectionManager } from '../connection-manager';
 import { RespValue } from '../resp2/parser';
@@ -11,7 +7,7 @@ export function registerKeysHandlers(manager: ConnectionManager): void {
     const result = await manager.execute(
       'SCAN', String(cursor), 'MATCH', match || '*', 'COUNT', String(count || 100)
     );
-    // SCAN returns [nextCursor, [key1, key2, ...]]
+
     if (Array.isArray(result) && result.length === 2) {
       return {
         cursor: parseInt(String(result[0]), 10),

@@ -1,11 +1,3 @@
-/**
- * Local Settings & Encrypted Profile Storage
- * 
- * Uses electron-store for persisting settings and connection profiles.
- * Uses Electron's native safeStorage (DPAPI on Windows / Keychain on macOS)
- * to encrypt passwords before writing to disk.
- */
-
 import Store from 'electron-store';
 import { safeStorage } from 'electron';
 import type { ConnectionProfile } from './connection-manager';
@@ -51,9 +43,7 @@ const store = new Store<AppSchema>({
 });
 
 export class SecureStore {
-  /**
-   * Encrypt a sensitive string (e.g. password) using native OS encryption.
-   */
+
   static encrypt(value: string): { data: string; isEncrypted: boolean } {
     try {
       if (safeStorage.isEncryptionAvailable()) {
@@ -63,13 +53,10 @@ export class SecureStore {
     } catch (err) {
       console.warn('[SecureStore] safeStorage encryption failed, falling back:', err);
     }
-    // Fallback if safeStorage is not available in current environment
+
     return { data: Buffer.from(value, 'utf8').toString('base64'), isEncrypted: false };
   }
 
-  /**
-   * Decrypt a sensitive string.
-   */
   static decrypt(data: string, isEncrypted: boolean): string {
     try {
       if (isEncrypted && safeStorage.isEncryptionAvailable()) {
@@ -79,13 +66,10 @@ export class SecureStore {
     } catch (err) {
       console.warn('[SecureStore] safeStorage decryption failed:', err);
     }
-    // Fallback decoding
+
     return Buffer.from(data, 'base64').toString('utf8');
   }
 
-  /**
-   * Save or update a connection profile.
-   */
   static saveProfile(profile: ConnectionProfile): void {
     const list = store.get('connections', []);
     const stored: StoredProfile = {
@@ -113,9 +97,6 @@ export class SecureStore {
     store.set('connections', list);
   }
 
-  /**
-   * Load all saved connection profiles with decrypted passwords.
-   */
   static getProfiles(): ConnectionProfile[] {
     const stored = store.get('connections', []);
     return stored.map(s => {
@@ -135,25 +116,16 @@ export class SecureStore {
     });
   }
 
-  /**
-   * Delete a saved profile by ID.
-   */
   static deleteProfile(id: string): void {
     const list = store.get('connections', []);
     const filtered = list.filter(p => p.id !== id);
     store.set('connections', filtered);
   }
 
-  /**
-   * Save window state across launches.
-   */
   static saveWindowState(state: WindowState): void {
     store.set('windowState', state);
   }
 
-  /**
-   * Retrieve stored window state.
-   */
   static getWindowState(): WindowState {
     return store.get('windowState', {
       width: 1400,

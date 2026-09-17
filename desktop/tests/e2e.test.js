@@ -10,13 +10,12 @@ describe('RediForge Desktop RESP2 Client E2E Integration', () => {
   const PORT = 6382;
 
   before(async () => {
-    // Spawn a dedicated RediForge server instance on PORT 6382
+
     const serverPath = path.resolve(__dirname, '../../src/server.js');
     serverProcess = spawn(process.execPath, [serverPath, '--port', String(PORT)], {
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
-    // Wait for server to output ready message
     await new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject(new Error('Timed out waiting for RediForge server to start'));
@@ -36,10 +35,8 @@ describe('RediForge Desktop RESP2 Client E2E Integration', () => {
       });
     });
 
-    // Small delay to ensure socket accepts connections
     await new Promise((r) => setTimeout(r, 200));
 
-    // Connect client
     client = new Resp2Client({
       host: '127.0.0.1',
       port: PORT,
@@ -103,7 +100,7 @@ describe('RediForge Desktop RESP2 Client E2E Integration', () => {
   it('scans keys with cursor', async () => {
     const scanRes = await client.sendCommand('SCAN', '0', 'MATCH', 'e2e:*', 'COUNT', '1000');
     assert(Array.isArray(scanRes));
-    assert.strictEqual(scanRes.length, 2); // [cursor, [keys]]
+    assert.strictEqual(scanRes.length, 2);
     const foundKeys = scanRes[1];
     assert(Array.isArray(foundKeys));
     assert(foundKeys.length >= 3);
@@ -125,7 +122,6 @@ describe('RediForge Desktop RESP2 Client E2E Integration', () => {
     const val = await client.sendCommand('GET', 'e2e:db2key');
     assert.strictEqual(val, 'value_in_db2');
 
-    // Switch back
     await client.sendCommand('SELECT', '0');
     const missing = await client.sendCommand('GET', 'e2e:db2key');
     assert.strictEqual(missing, null);

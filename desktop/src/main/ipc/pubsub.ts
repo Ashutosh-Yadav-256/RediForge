@@ -1,7 +1,3 @@
-/**
- * Pub/Sub IPC Handlers — Subscribe, publish, message streaming.
- */
-
 import { ipcMain, BrowserWindow } from 'electron';
 import { ConnectionManager } from '../connection-manager';
 import { Resp2Client } from '../resp2/client';
@@ -15,7 +11,7 @@ export function registerPubSubHandlers(
 ): void {
   ipcMain.handle('pubsub:subscribe', async (_event, channel: string) => {
     try {
-      // Pub/sub needs a dedicated connection (subscriber can't send other commands)
+
       const status = manager.getStatus();
       if (!status.connected || !status.host || !status.port) {
         return { success: false, error: 'Not connected' };
@@ -29,7 +25,7 @@ export function registerPubSubHandlers(
         });
 
         pubsubClient.on('message', (msg: RespValue) => {
-          // Forward pub/sub messages to renderer
+
           const win = getMainWindow();
           if (win && !win.isDestroyed()) {
             win.webContents.send('pubsub:message', {
@@ -62,7 +58,7 @@ export function registerPubSubHandlers(
 
   ipcMain.handle('pubsub:publish', async (_event, channel: string, message: string) => {
     try {
-      // Publish on the main connection (not the subscriber)
+
       const result = await manager.execute('PUBLISH', channel, message);
       return { success: true, receivers: result };
     } catch (err: any) {

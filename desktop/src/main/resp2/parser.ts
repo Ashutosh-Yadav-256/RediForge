@@ -1,13 +1,8 @@
-/**
- * RESP2 Parser — TypeScript port of RediForge's server-side parser.
- * Parses RESP2 wire protocol responses from the server into typed values.
- */
-
 export type RespValue = string | number | null | Error | RespValue[];
 
 const CR = 0x0d;
 const LF = 0x0a;
-const MAX_PARSER_BUFFER = 64 * 1024 * 1024; // 64 MB
+const MAX_PARSER_BUFFER = 64 * 1024 * 1024;
 
 interface ParseResult {
   value: RespValue;
@@ -57,11 +52,11 @@ export class RespParser {
     const type = this._buffer[0];
 
     switch (type) {
-      case 0x2b: return this._parseSimpleString();  // +
-      case 0x2d: return this._parseError();          // -
-      case 0x3a: return this._parseInteger();        // :
-      case 0x24: return this._parseBulkString();     // $
-      case 0x2a: return this._parseArray();          // *
+      case 0x2b: return this._parseSimpleString();
+      case 0x2d: return this._parseError();
+      case 0x3a: return this._parseInteger();
+      case 0x24: return this._parseBulkString();
+      case 0x2a: return this._parseArray();
       default:   return this._parseInline();
     }
   }
