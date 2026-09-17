@@ -19,6 +19,27 @@ Unlike traditional web-based admin tools that require an intermediate HTTP or We
 
 ---
 
+## Downloads & Releases
+
+Pre-compiled production installers for RediForge Desktop Admin are published under [GitHub Releases](https://github.com/Ashutosh-Yadav-256/RediForge/releases/tag/v1.0.0):
+
+| Platform | Package Format | Direct Download |
+| :--- | :--- | :--- |
+| **macOS** (Apple Silicon M-Series) | Apple Disk Image (`.dmg`) | [RediForge.Desktop-1.0.0-arm64.dmg](https://github.com/Ashutosh-Yadav-256/RediForge/releases/download/v1.0.0/RediForge.Desktop-1.0.0-arm64.dmg) |
+| **Windows** (x64) | NSIS Installer (`.exe`) | [RediForge.Desktop.Setup.1.0.0.exe](https://github.com/Ashutosh-Yadav-256/RediForge/releases/download/v1.0.0/RediForge.Desktop.Setup.1.0.0.exe) |
+| **Linux** (x86_64) | Portable AppImage (`.AppImage`) | [RediForge.Desktop-1.0.0.AppImage](https://github.com/Ashutosh-Yadav-256/RediForge/releases/download/v1.0.0/RediForge.Desktop-1.0.0.AppImage) |
+
+### Mobile Administration (iOS & Android)
+
+Electron is a desktop runtime (Chromium + Node.js) engineered for Windows, macOS, and Linux, and does not compile into mobile `.ipa` or `.apk` binaries. To manage RediForge from mobile devices:
+
+1. **Progressive Web App (PWA)**: Visit `https://rediforge.in` on mobile browsers.
+   - **iOS (Safari)**: Tap Share and choose **Add to Home Screen** for a full-screen native app experience.
+   - **Android (Chrome)**: Tap Menu and choose **Install App** to add to the application drawer.
+2. **Network Bridge**: Mobile web sandboxes forbid raw TCP socket connections on port 6379. Mobile clients connect through the RediForge WebSocket Bridge (`wss://rediforge.in` / `src/bridge.js`).
+
+---
+
 ## Architectural Highlights
 
 ```
