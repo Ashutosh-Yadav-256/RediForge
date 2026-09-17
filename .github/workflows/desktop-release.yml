@@ -5,12 +5,18 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag name'
+        required: false
+        default: 'v1.0.0'
 
 permissions:
   contents: write
 
 jobs:
-  build-and-release:
+  build:
+    name: Build (${{ matrix.platform }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -19,15 +25,18 @@ jobs:
           - os: windows-latest
             platform: win
             build-args: --win nsis --publish never
-            artifact: desktop/release/*.exe
+            artifact-pattern: desktop/release/*.exe
+            artifact-name: windows-installer
           - os: macos-latest
             platform: mac
-            build-args: --mac dmg zip --publish never
-            artifact: desktop/release/*.dmg
+            build-args: --mac dmg --publish never
+            artifact-pattern: desktop/release/*.dmg
+            artifact-name: macos-installer
           - os: ubuntu-latest
             platform: linux
             build-args: --linux AppImage --publish never
-            artifact: desktop/release/*.AppImage
+            artifact-pattern: desktop/release/*.AppImage
+            artifact-name: linux-installer
 
     steps:
       - name: Checkout repository
@@ -59,12 +68,33 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
-      - name: Upload Release Asset to GitHub Releases
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-pattern }}
+          if-no-files-found: error
+
+  release:
+    name: Publish Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: RediForge Desktop ${{ github.ref_name }}
-          files: ${{ matrix.artifact }}
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          name: RediForge Desktop ${{ github.event.inputs.tag || github.ref_name }}
+          files: release-assets/*
           generate_release_notes: true
           draft: false
           prerelease: false
