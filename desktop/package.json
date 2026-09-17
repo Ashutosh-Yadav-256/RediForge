@@ -5,6 +5,10 @@
   "main": "dist/main/main.js",
   "author": "Ashutosh Yadav",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ashutosh-Yadav-256/RediForge.git"
+  },
   "scripts": {
     "dev": "concurrently \"npm run dev:main\" \"npm run dev:renderer\"",
     "dev:main": "tsc -p tsconfig.main.json && electron .",
@@ -37,6 +41,11 @@
   "build": {
     "appId": "com.rediforge.desktop",
     "productName": "RediForge Desktop",
+    "publish": {
+      "provider": "github",
+      "owner": "Ashutosh-Yadav-256",
+      "repo": "RediForge"
+    },
     "directories": {
       "output": "release"
     },
