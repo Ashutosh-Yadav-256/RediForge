@@ -1,0 +1,8 @@
+desktop/
+node_modules/
+.git
+.github
+*.rdb
+*.aof
+docs/
+*.md

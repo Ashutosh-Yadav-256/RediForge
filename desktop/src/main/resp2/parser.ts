@@ -1,0 +1,172 @@
+/**
+ * RESP2 Parser — TypeScript port of RediForge's server-side parser.
+ * Parses RESP2 wire protocol responses from the server into typed values.
+ */
+
+export type RespValue = string | number | null | Error | RespValue[];
+
+const CR = 0x0d;
+const LF = 0x0a;
+const MAX_PARSER_BUFFER = 64 * 1024 * 1024; // 64 MB
+
+interface ParseResult {
+  value: RespValue;
+  consumed: number;
+}
+
+export class RespParser {
+  private _buffer: Buffer;
+
+  constructor() {
+    this._buffer = Buffer.alloc(0);
+  }
+
+  append(chunk: Buffer): void {
+    this._buffer = Buffer.concat([this._buffer, chunk]);
+    if (this._buffer.length > MAX_PARSER_BUFFER) {
+      this._buffer = Buffer.alloc(0);
+      throw new Error('RESP parser buffer exceeded maximum size');
+    }
+  }
+
+  parse(): RespValue[] {
+    const results: RespValue[] = [];
+    let parsed: ParseResult | null;
+
+    while (this._buffer.length > 0) {
+      parsed = this._tryParse();
+      if (parsed === null) break;
+      results.push(parsed.value);
+      this._buffer = this._buffer.slice(parsed.consumed);
+    }
+
+    return results;
+  }
+
+  reset(): void {
+    this._buffer = Buffer.alloc(0);
+  }
+
+  get pending(): number {
+    return this._buffer.length;
+  }
+
+  private _tryParse(): ParseResult | null {
+    if (this._buffer.length === 0) return null;
+
+    const type = this._buffer[0];
+
+    switch (type) {
+      case 0x2b: return this._parseSimpleString();  // +
+      case 0x2d: return this._parseError();          // -
+      case 0x3a: return this._parseInteger();        // :
+      case 0x24: return this._parseBulkString();     // $
+      case 0x2a: return this._parseArray();          // *
+      default:   return this._parseInline();
+    }
+  }
+
+  private _findCRLF(offset: number): number {
+    for (let i = offset; i < this._buffer.length - 1; i++) {
+      if (this._buffer[i] === CR && this._buffer[i + 1] === LF) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private _parseSimpleString(): ParseResult | null {
+    const end = this._findCRLF(1);
+    if (end < 0) return null;
+    const str = this._buffer.toString('utf8', 1, end);
+    return { value: str, consumed: end + 2 };
+  }
+
+  private _parseError(): ParseResult | null {
+    const end = this._findCRLF(1);
+    if (end < 0) return null;
+    const msg = this._buffer.toString('utf8', 1, end);
+    return { value: new Error(msg), consumed: end + 2 };
+  }
+
+  private _parseInteger(): ParseResult | null {
+    const end = this._findCRLF(1);
+    if (end < 0) return null;
+    const num = parseInt(this._buffer.toString('utf8', 1, end), 10);
+    return { value: num, consumed: end + 2 };
+  }
+
+  private _parseBulkString(): ParseResult | null {
+    const lenEnd = this._findCRLF(1);
+    if (lenEnd < 0) return null;
+
+    const len = parseInt(this._buffer.toString('utf8', 1, lenEnd), 10);
+
+    if (len === -1) {
+      return { value: null, consumed: lenEnd + 2 };
+    }
+
+    const dataStart = lenEnd + 2;
+    const dataEnd = dataStart + len;
+
+    if (this._buffer.length < dataEnd + 2) return null;
+
+    const str = this._buffer.toString('utf8', dataStart, dataEnd);
+    return { value: str, consumed: dataEnd + 2 };
+  }
+
+  private _parseArray(): ParseResult | null {
+    const lenEnd = this._findCRLF(1);
+    if (lenEnd < 0) return null;
+
+    const count = parseInt(this._buffer.toString('utf8', 1, lenEnd), 10);
+
+    if (count === -1) {
+      return { value: null, consumed: lenEnd + 2 };
+    }
+
+    if (count === 0) {
+      return { value: [], consumed: lenEnd + 2 };
+    }
+
+    const saved = this._buffer;
+    this._buffer = this._buffer.slice(lenEnd + 2);
+    let totalConsumed = lenEnd + 2;
+
+    const elements: RespValue[] = [];
+    for (let i = 0; i < count; i++) {
+      const element = this._tryParse();
+      if (element === null) {
+        this._buffer = saved;
+        return null;
+      }
+      elements.push(element.value);
+      this._buffer = this._buffer.slice(element.consumed);
+      totalConsumed += element.consumed;
+    }
+
+    this._buffer = saved;
+    return { value: elements, consumed: totalConsumed };
+  }
+
+  private _parseInline(): ParseResult | null {
+    const end = this._findCRLF(0);
+    if (end < 0) {
+      const nlPos = this._buffer.indexOf(0x0a);
+      if (nlPos >= 0) {
+        const line = this._buffer.toString('utf8', 0, nlPos).trim();
+        if (line.length === 0) {
+          return { value: [], consumed: nlPos + 1 };
+        }
+        return { value: line, consumed: nlPos + 1 };
+      }
+      return null;
+    }
+
+    const line = this._buffer.toString('utf8', 0, end).trim();
+    if (line.length === 0) {
+      return { value: [], consumed: end + 2 };
+    }
+    return { value: line, consumed: end + 2 };
+  }
+}

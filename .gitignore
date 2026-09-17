@@ -32,3 +32,8 @@ coverage/
 
 # External cloned repositories
 repos/
+
+# Desktop app build artifacts
+desktop/dist/
+desktop/release/
+
