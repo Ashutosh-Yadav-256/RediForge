@@ -130,6 +130,26 @@ reg('unwatch', txCmds.unwatch, 't');
 
 reg('auth', authCmds.auth, 'r');
 
+function cmdPsync(args, ctx) {
+    if (ctx && ctx.server && ctx.server.primary && ctx.connection) {
+        var replId = args[0] ? String(args[0]) : '?';
+        var offset = args[1] ? String(args[1]) : '-1';
+        ctx.server.primary.handlePsync(ctx.connection, replId, offset);
+        return null;
+    }
+    return encoder.encodeError('ERR PSYNC only supported in master role');
+}
+
+function cmdReplconf(args, ctx) {
+    if (ctx && ctx.server && ctx.server.primary && ctx.connection) {
+        return ctx.server.primary.handleReplconf(ctx.connection, args);
+    }
+    return encoder.ok();
+}
+
+reg('psync', cmdPsync, 'r');
+reg('replconf', cmdReplconf, 'r');
+
 const TX_PASSTHROUGH = new Set(['exec', 'discard', 'multi', 'watch']);
 
 function dispatch(cmdParts, ctx) {

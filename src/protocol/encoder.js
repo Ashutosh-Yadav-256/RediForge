@@ -18,7 +18,14 @@ function encodeBulkString(str) {
     if (str === null || str === undefined) {
         return '$-1' + CRLF;
     }
-    const s = String(str);
+    if (Buffer.isBuffer(str)) {
+        return Buffer.concat([
+            Buffer.from('$' + str.length + CRLF),
+            str,
+            Buffer.from(CRLF)
+        ]);
+    }
+    const s = typeof str === 'string' ? str : String(str);
     return '$' + Buffer.byteLength(s) + CRLF + s + CRLF;
 }
 
@@ -26,20 +33,35 @@ function encodeArray(items) {
     if (items === null || items === undefined) {
         return '*-1' + CRLF;
     }
-    let out = '*' + items.length + CRLF;
+    const chunks = [];
+    chunks.push(Buffer.from('*' + items.length + CRLF));
+    let hasBuffer = false;
+
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
+        let encoded;
         if (item === null || item === undefined) {
-            out += '$-1' + CRLF;
+            encoded = '$-1' + CRLF;
         } else if (typeof item === 'number' || typeof item === 'bigint') {
-            out += encodeInteger(item);
+            encoded = encodeInteger(item);
         } else if (Array.isArray(item)) {
-            out += encodeArray(item);
+            encoded = encodeArray(item);
         } else {
-            out += encodeBulkString(item);
+            encoded = encodeBulkString(item);
+        }
+
+        if (Buffer.isBuffer(encoded)) {
+            hasBuffer = true;
+            chunks.push(encoded);
+        } else {
+            chunks.push(Buffer.from(encoded));
         }
     }
-    return out;
+
+    if (hasBuffer) {
+        return Buffer.concat(chunks);
+    }
+    return Buffer.concat(chunks).toString('utf8');
 }
 
 function ok() {
@@ -88,6 +110,10 @@ function integerReply(n) {
     return encodeInteger(n);
 }
 
+function oom() {
+    return encodeError("OOM command not allowed when used memory > 'maxmemory'.");
+}
+
 module.exports = {
     encodeSimpleString,
     encodeError,
@@ -104,5 +130,6 @@ module.exports = {
     syntaxError,
     wrongArgCount,
     unknownCommand,
-    integerReply
+    integerReply,
+    oom
 };

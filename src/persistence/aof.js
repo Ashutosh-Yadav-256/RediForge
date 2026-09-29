@@ -55,21 +55,56 @@ AofPersistence.prototype.truncate = function () {
 };
 
 AofPersistence.prototype.appendCommand = function (cmdParts) {
-    if (this._fd === null) return;
+    if (this._fd === null || !cmdParts || cmdParts.length === 0) return;
 
-    var line = '*' + cmdParts.length + '\r\n';
+    var chunks = [Buffer.from('*' + cmdParts.length + '\r\n')];
     for (var i = 0; i < cmdParts.length; i++) {
-        var s = String(cmdParts[i]);
-        line += '$' + Buffer.byteLength(s) + '\r\n' + s + '\r\n';
+        var part = cmdParts[i];
+        if (Buffer.isBuffer(part)) {
+            chunks.push(Buffer.from('$' + part.length + '\r\n'));
+            chunks.push(part);
+            chunks.push(Buffer.from('\r\n'));
+        } else {
+            var s = typeof part === 'string' ? part : String(part);
+            var len = Buffer.byteLength(s);
+            chunks.push(Buffer.from('$' + len + '\r\n' + s + '\r\n'));
+        }
     }
 
-    this._writeBuffer.push(line);
+    this._writeBuffer.push(Buffer.concat(chunks));
 
     var policy = this._config.get('appendfsync');
     if (policy === 'always') {
         this._flush();
     }
 };
+
+AofPersistence.prototype.appendEvent = function (event) {
+    if (!event) return;
+    if (typeof event.db === 'number' && event.db !== this._currentDb) {
+        this._currentDb = event.db;
+        this.appendCommand(['SELECT', String(event.db)]);
+    }
+    var cmdParts = [event.command].concat(event.args || []);
+    this.appendCommand(cmdParts);
+};
+
+function decodeReplayPart(part, isCmdOrKey) {
+    if (!Buffer.isBuffer(part)) {
+        return typeof part === 'string' ? part : String(part);
+    }
+    if (isCmdOrKey) {
+        return part.toString('utf8');
+    }
+    if (part.includes(0x00)) {
+        return part;
+    }
+    var str = part.toString('utf8');
+    if (Buffer.from(str, 'utf8').equals(part)) {
+        return str;
+    }
+    return part;
+}
 
 AofPersistence.prototype.replay = function (dispatchFn, ctx) {
     var filePath = this.getFilePath();
@@ -79,31 +114,50 @@ AofPersistence.prototype.replay = function (dispatchFn, ctx) {
         return 0;
     }
 
-    var data;
+    var fd;
     try {
-        data = fs.readFileSync(filePath);
+        fd = fs.openSync(filePath, 'r');
     } catch (err) {
-        this._log.error('AOF: read failed - ' + err.message);
+        this._log.error('AOF: open for replay failed - ' + err.message);
         return 0;
     }
 
-    if (data.length === 0) return 0;
-
-    var parser = new RespParser();
-    parser.append(data);
-    var commands = parser.parse();
-
+    var parser = new RespParser({ returnBuffers: true });
     var replayed = 0;
-    for (var i = 0; i < commands.length; i++) {
-        var cmd = commands[i];
-        if (Array.isArray(cmd) && cmd.length > 0) {
-            try {
-                dispatchFn(cmd, ctx);
-                replayed++;
-            } catch (err) {
-                this._log.error('AOF: replay error at command ' + replayed + ' - ' + err.message);
+    var CHUNK_SIZE = 64 * 1024;
+    var chunk = Buffer.alloc(CHUNK_SIZE);
+
+    try {
+        var bytesRead = 0;
+        while ((bytesRead = fs.readSync(fd, chunk, 0, CHUNK_SIZE, null)) > 0) {
+            var slice = chunk.subarray(0, bytesRead);
+            parser.append(slice);
+            var commands = parser.parse();
+
+            for (var i = 0; i < commands.length; i++) {
+                var rawCmd = commands[i];
+                if (Array.isArray(rawCmd) && rawCmd.length > 0) {
+                    try {
+                        var cmd = [];
+                        for (var k = 0; k < rawCmd.length; k++) {
+                            cmd.push(decodeReplayPart(rawCmd[k], k === 0 || k === 1));
+                        }
+                        dispatchFn(cmd, ctx);
+                        replayed++;
+                    } catch (err) {
+                        this._log.error('AOF: replay error at command ' + replayed + ' - ' + err.message);
+                    }
+                }
             }
         }
+
+        if (parser.pending > 0) {
+            this._log.warn('AOF: detected truncated final command of ' + parser.pending + ' bytes at end of ' + filePath);
+        }
+    } catch (err) {
+        this._log.error('AOF: replay error - ' + err.message);
+    } finally {
+        try { fs.closeSync(fd); } catch (e) {}
     }
 
     this._log.info('AOF: replayed ' + replayed + ' commands from ' + filePath);
@@ -113,7 +167,7 @@ AofPersistence.prototype.replay = function (dispatchFn, ctx) {
 AofPersistence.prototype._flush = function () {
     if (this._fd === null || this._writeBuffer.length === 0) return;
 
-    var data = this._writeBuffer.join('');
+    var data = Buffer.concat(this._writeBuffer);
     this._writeBuffer = [];
 
     try {

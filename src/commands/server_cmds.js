@@ -87,6 +87,19 @@ function cmdInfo(args, ctx) {
     sections.push('# Stats');
     sections.push('');
 
+    sections.push('# Replication');
+    if (ctx && ctx.server && ctx.server.primary) {
+        sections.push(ctx.server.primary.getInfo().replace('# Replication\r\n', ''));
+    } else if (ctx && ctx.server && ctx.server.replica) {
+        sections.push(ctx.server.replica.getInfo().replace('# Replication\r\n', ''));
+    } else {
+        sections.push('role:master');
+        sections.push('connected_slaves:0');
+        sections.push('master_replid:0000000000000000000000000000000000000000');
+        sections.push('master_repl_offset:0');
+    }
+    sections.push('');
+
     sections.push('# Keyspace');
     for (let i = 0; i < ctx.store.dbCount; i++) {
         const size = ctx.store.dbSize(i);

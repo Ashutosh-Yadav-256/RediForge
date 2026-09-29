@@ -80,6 +80,33 @@ describe('Expiry Engine', () => {
         store.expiry.clearAll();
         assert.strictEqual(store.expiry.size, 0);
     });
+
+    it('peekNextExpiry returns the earliest expiring key in O(1)', () => {
+        store.set(0, 'later', '1', TYPE_STRING);
+        store.set(0, 'sooner', '2', TYPE_STRING);
+        store.expiry.setExpiry(0, 'later', 10000);
+        store.expiry.setExpiry(0, 'sooner', 2000);
+
+        const next = store.expiry.peekNextExpiry();
+        assert.ok(next);
+        assert.strictEqual(next.key, 'sooner');
+        assert.strictEqual(next.db, 0);
+    });
+
+    it('expireNextKey and bulkCleanup removes expired keys without full map sweep', () => {
+        store.set(0, 'expired1', '1', TYPE_STRING);
+        store.set(0, 'expired2', '2', TYPE_STRING);
+        store.set(0, 'future', '3', TYPE_STRING);
+        store.expiry.setExpireAt(0, 'expired1', Date.now() - 100);
+        store.expiry.setExpireAt(0, 'expired2', Date.now() - 50);
+        store.expiry.setExpireAt(0, 'future', Date.now() + 100000);
+
+        const cleaned = store.expiry.bulkCleanup(store, 10);
+        assert.strictEqual(cleaned, 2);
+        assert.strictEqual(store.exists(0, 'expired1'), false);
+        assert.strictEqual(store.exists(0, 'expired2'), false);
+        assert.strictEqual(store.exists(0, 'future'), true);
+    });
 });
 
 describe('LRU Eviction', () => {
@@ -105,8 +132,19 @@ describe('LRU Eviction', () => {
             store.set(0, 'key' + i, 'val' + i, TYPE_STRING);
         }
         const result = store.lru.evict(store, 'allkeys-lru', 1024);
-        assert.strictEqual(result, true);
+        assert.ok(result > 0);
         assert.ok(store.dbSize(0) < 20);
+    });
+
+    it('evict with volatile-lru only removes keys with expiry', () => {
+        store.set(0, 'no-exp', 'val1', TYPE_STRING);
+        store.set(0, 'has-exp', 'val2', TYPE_STRING);
+        store.expiry.setExpiry(0, 'has-exp', 10000);
+
+        const result = store.lru.evict(store, 'volatile-lru', 64);
+        assert.ok(result > 0);
+        assert.strictEqual(store.exists(0, 'no-exp'), true);
+        assert.strictEqual(store.exists(0, 'has-exp'), false);
     });
 });
 

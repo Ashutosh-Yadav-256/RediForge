@@ -50,7 +50,7 @@ describe('Security & Architecture Enhancements', () => {
 
         it('handles numbers greater than JavaScript Number.MAX_SAFE_INTEGER (53-bit)', () => {
             const ctx = makeCtx(store);
-            const largeIntStr = '5000000000000000000'; // 5 * 10^18 > 2^53
+            const largeIntStr = '5000000000000000000';
             dispatch(['set', 'bignum', largeIntStr], ctx);
 
             const r1 = dispatch(['incr', 'bignum'], ctx);
@@ -107,7 +107,7 @@ describe('Security & Architecture Enhancements', () => {
 
         it('evicts keys when maxmemory limit is reached', () => {
             const config = new ServerConfig({
-                maxmemory: 300, // Small memory budget
+                maxmemory: 300,
                 maxmemory_policy: 'allkeys-lru'
             });
             const store = new DataStore(16, config);

@@ -6,38 +6,31 @@ var validate = require('../utils/validate');
 
 function cmdSadd(args, ctx) {
     if (args.length < 2) return encoder.wrongArgCount('sadd');
-    if (!ctx.store.checkType(ctx.db, args[0], TYPE_SET)) return encoder.wrongType();
 
-    var set = ctx.store.get(ctx.db, args[0]);
-    if (set === undefined) set = new Set();
-
-    var added = 0;
+    var members = [];
     for (var i = 1; i < args.length; i++) {
-        if (!set.has(args[i])) {
-            set.add(args[i]);
-            added++;
-        }
+        members.push(args[i]);
     }
 
-    ctx.store.set(ctx.db, args[0], set, TYPE_SET);
-    return encoder.integerReply(added);
+    var res = ctx.store.setAdd(ctx.db, args[0], members);
+    if (!res.ok) {
+        if (res.err === 'WRONGTYPE') return encoder.wrongType();
+        return encoder.oom();
+    }
+    return encoder.integerReply(res.added);
 }
 
 function cmdSrem(args, ctx) {
     if (args.length < 2) return encoder.wrongArgCount('srem');
-    if (!ctx.store.checkType(ctx.db, args[0], TYPE_SET)) return encoder.wrongType();
 
-    var set = ctx.store.get(ctx.db, args[0]);
-    if (!set) return encoder.integerReply(0);
-
-    var removed = 0;
+    var members = [];
     for (var i = 1; i < args.length; i++) {
-        if (set.delete(args[i])) removed++;
+        members.push(args[i]);
     }
 
-    if (removed > 0) ctx.store.markDirty(ctx.db, args[0]);
-    if (set.size === 0) ctx.store.deleteKey(ctx.db, args[0]);
-    return encoder.integerReply(removed);
+    var res = ctx.store.setRemove(ctx.db, args[0], members);
+    if (!res.ok) return encoder.wrongType();
+    return encoder.integerReply(res.removed);
 }
 
 function cmdSmembers(args, ctx) {
@@ -195,9 +188,7 @@ function cmdSpop(args, ctx) {
     if (args.length === 1) {
         var idx = Math.floor(Math.random() * members.length);
         var popped = members[idx];
-        set.delete(popped);
-        ctx.store.markDirty(ctx.db, args[0]);
-        if (set.size === 0) ctx.store.deleteKey(ctx.db, args[0]);
+        ctx.store.setRemove(ctx.db, args[0], [popped]);
         return encoder.encodeBulkString(popped);
     }
 
@@ -205,15 +196,14 @@ function cmdSpop(args, ctx) {
     if (count === null || count < 0) return encoder.encodeError('ERR value is not an integer or out of range');
 
     var result = [];
-    for (var pi = 0; pi < count && set.size > 0; pi++) {
-        var arr = Array.from(set);
-        var pidx = Math.floor(Math.random() * arr.length);
-        result.push(arr[pidx]);
-        set.delete(arr[pidx]);
+    var pool = members.slice();
+    for (var pi = 0; pi < count && pool.length > 0; pi++) {
+        var pidx = Math.floor(Math.random() * pool.length);
+        result.push(pool[pidx]);
+        pool.splice(pidx, 1);
     }
 
-    ctx.store.markDirty(ctx.db, args[0]);
-    if (set.size === 0) ctx.store.deleteKey(ctx.db, args[0]);
+    ctx.store.setRemove(ctx.db, args[0], result);
     return encoder.encodeArray(result);
 }
 

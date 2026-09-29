@@ -10,14 +10,37 @@ var AofPersistence = require('./persistence/aof').AofPersistence;
 var logger = require('./utils/logger');
 var registry = require('./commands/registry');
 var WebSocketBridge = require('./bridge').WebSocketBridge;
+var AuthService = require('./security/auth_service').AuthService;
+var AuditLogger = require('./security/audit_logger').AuditLogger;
+var CommandGateway = require('./security/command_gateway').CommandGateway;
+var MutationEngine = require('./engine/mutation_engine').MutationEngine;
+var WriteAheadLog = require('./persistence/wal').WriteAheadLog;
+var PrimaryReplication = require('./replication/primary').PrimaryReplication;
+var ReplicaReplication = require('./replication/replica').ReplicaReplication;
 
 function RedisGenServer(options) {
     this.config = new ServerConfig(options);
     this.log = logger.getLogger(this.config.get('loglevel'));
     this.store = new DataStore(this.config.get('databases'), this.config);
+    this.mutationEngine = new MutationEngine();
+    this.store.setMutationEngine(this.mutationEngine);
     this.pubsub = new PubSubBroker();
     this.rdb = new RdbPersistence(this.config, this.store);
     this.aof = new AofPersistence(this.config, this.store);
+    this.wal = new WriteAheadLog(this.config);
+    this.mutationEngine.setWal(this.aof);
+    this.primary = new PrimaryReplication(this, {
+        backlogSize: (options && options.replBacklogSize) || (10 * 1024 * 1024)
+    });
+    this.replica = null;
+    this.authService = new AuthService();
+    this.auditLogger = new AuditLogger(1000);
+    this.gateway = new CommandGateway(this, {
+        authService: this.authService,
+        auditLogger: this.auditLogger,
+        rateLimitCapacity: (options && options.rateLimitCapacity) || 100000,
+        rateLimitRefill: (options && options.rateLimitRefill) || 50000
+    });
     this._clients = new Set();
     this._server = null;
     this._bridge = null;
@@ -75,6 +98,7 @@ RedisGenServer.prototype._onConnection = function (socket) {
 
 RedisGenServer.prototype.removeClient = function (conn) {
     this._clients.delete(conn);
+    if (this.primary) this.primary.removeReplica(conn);
     this.log.debug('Client disconnected: ' + conn.remoteAddr + ' (id=' + conn.id + ')');
 };
 

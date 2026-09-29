@@ -64,15 +64,8 @@ function cmdExpire(args, ctx) {
     var seconds = validate.strictParseInt(args[1]);
     if (seconds === null) return encoder.encodeError('ERR value is not an integer or out of range');
 
-    if (!ctx.store.exists(ctx.db, key)) return encoder.integerReply(0);
-
-    if (seconds <= 0) {
-        ctx.store.deleteKey(ctx.db, key);
-        return encoder.integerReply(1);
-    }
-
-    ctx.store.expiry.setExpiry(ctx.db, key, seconds * 1000);
-    return encoder.integerReply(1);
+    var res = ctx.store.expire(ctx.db, key, seconds);
+    return encoder.integerReply(res);
 }
 
 function cmdPexpire(args, ctx) {
@@ -82,15 +75,8 @@ function cmdPexpire(args, ctx) {
     var ms = validate.strictParseInt(args[1]);
     if (ms === null) return encoder.encodeError('ERR value is not an integer or out of range');
 
-    if (!ctx.store.exists(ctx.db, key)) return encoder.integerReply(0);
-
-    if (ms <= 0) {
-        ctx.store.deleteKey(ctx.db, key);
-        return encoder.integerReply(1);
-    }
-
-    ctx.store.expiry.setExpiry(ctx.db, key, ms);
-    return encoder.integerReply(1);
+    var res = ctx.store.pexpire(ctx.db, key, ms);
+    return encoder.integerReply(res);
 }
 
 function cmdExpireat(args, ctx) {
@@ -100,16 +86,8 @@ function cmdExpireat(args, ctx) {
     var ts = validate.strictParseInt(args[1]);
     if (ts === null) return encoder.encodeError('ERR value is not an integer or out of range');
 
-    if (!ctx.store.exists(ctx.db, key)) return encoder.integerReply(0);
-
-    var deadline = ts * 1000;
-    if (deadline <= Date.now()) {
-        ctx.store.deleteKey(ctx.db, key);
-        return encoder.integerReply(1);
-    }
-
-    ctx.store.expiry.setExpireAt(ctx.db, key, deadline);
-    return encoder.integerReply(1);
+    var res = ctx.store.expireAt(ctx.db, key, ts);
+    return encoder.integerReply(res);
 }
 
 function cmdPexpireat(args, ctx) {
@@ -119,15 +97,8 @@ function cmdPexpireat(args, ctx) {
     var tsMs = validate.strictParseInt(args[1]);
     if (tsMs === null) return encoder.encodeError('ERR value is not an integer or out of range');
 
-    if (!ctx.store.exists(ctx.db, key)) return encoder.integerReply(0);
-
-    if (tsMs <= Date.now()) {
-        ctx.store.deleteKey(ctx.db, key);
-        return encoder.integerReply(1);
-    }
-
-    ctx.store.expiry.setExpireAt(ctx.db, key, tsMs);
-    return encoder.integerReply(1);
+    var res = ctx.store.pexpireAt(ctx.db, key, tsMs);
+    return encoder.integerReply(res);
 }
 
 function cmdTtl(args, ctx) {
@@ -154,18 +125,19 @@ function cmdPersist(args, ctx) {
     if (args.length !== 1) return encoder.wrongArgCount('persist');
 
     var key = args[0];
-    if (!ctx.store.exists(ctx.db, key)) return encoder.integerReply(0);
-    if (!ctx.store.expiry.hasExpiry(ctx.db, key)) return encoder.integerReply(0);
-
-    ctx.store.expiry.removeExpiry(ctx.db, key);
-    return encoder.integerReply(1);
+    var res = ctx.store.persist(ctx.db, key);
+    return encoder.integerReply(res);
 }
 
 function cmdRename(args, ctx) {
     if (args.length !== 2) return encoder.wrongArgCount('rename');
 
-    if (!ctx.store.rename(ctx.db, args[0], args[1])) {
+    var res = ctx.store.rename(ctx.db, args[0], args[1]);
+    if (res === false) {
         return encoder.encodeError('ERR no such key');
+    }
+    if (res && res.err === 'OOM') {
+        return encoder.oom();
     }
 
     return encoder.ok();
@@ -182,7 +154,10 @@ function cmdRenamenx(args, ctx) {
         return encoder.integerReply(0);
     }
 
-    ctx.store.rename(ctx.db, args[0], args[1]);
+    var res = ctx.store.rename(ctx.db, args[0], args[1]);
+    if (res && res.err === 'OOM') {
+        return encoder.oom();
+    }
     return encoder.integerReply(1);
 }
 

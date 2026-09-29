@@ -99,14 +99,30 @@ RdbPersistence.prototype._buildSnapshot = function () {
 
     for (var i = 0; i < this._store.dbCount; i++) {
         var data = this._store.exportDbData(i);
-        if (Object.keys(data).length > 0) {
-            databases[i] = {};
-            for (var key in data) {
+        if (Array.isArray(data) && data.length > 0) {
+            databases[i] = [];
+            for (var j = 0; j < data.length; j++) {
+                var k = data[j][0];
+                var ent = data[j][1];
+                databases[i].push([
+                    k,
+                    {
+                        type: ent.type,
+                        value: this._serializeValue(ent.value, ent.type)
+                    }
+                ]);
+            }
+        } else if (data && !Array.isArray(data) && Object.keys(data).length > 0) {
+            databases[i] = [];
+            for (var key of Object.keys(data)) {
                 var entry = data[key];
-                databases[i][key] = {
-                    type: entry.type,
-                    value: this._serializeValue(entry.value, entry.type)
-                };
+                databases[i].push([
+                    key,
+                    {
+                        type: entry.type,
+                        value: this._serializeValue(entry.value, entry.type)
+                    }
+                ]);
             }
         }
     }
@@ -115,7 +131,7 @@ RdbPersistence.prototype._buildSnapshot = function () {
 
     return {
         magic: 'REDISGEN',
-        version: 1,
+        version: 2,
         timestamp: Date.now(),
         databases: databases,
         expiries: expiries
@@ -134,10 +150,20 @@ RdbPersistence.prototype._restoreSnapshot = function (snapshot) {
         var db = parseInt(dbIdx, 10);
         var entries = snapshot.databases[dbIdx];
 
-        for (var key in entries) {
-            var entry = entries[key];
-            var value = this._deserializeValue(entry.value, entry.type);
-            this._store.set(db, key, value, entry.type);
+        if (Array.isArray(entries)) {
+            for (var i = 0; i < entries.length; i++) {
+                var item = entries[i];
+                var key = item[0];
+                var entry = item[1];
+                var value = this._deserializeValue(entry.value, entry.type);
+                this._store.set(db, key, value, entry.type);
+            }
+        } else if (entries && typeof entries === 'object') {
+            for (var k in entries) {
+                var oldEntry = entries[k];
+                var val = this._deserializeValue(oldEntry.value, oldEntry.type);
+                this._store.set(db, k, val, oldEntry.type);
+            }
         }
     }
 
@@ -155,6 +181,9 @@ RdbPersistence.prototype._restoreSnapshot = function (snapshot) {
     this._store.resetDirty();
 };
 
+var Deque = require('../structures/deque').Deque;
+var SortedSet = require('../structures/zset').SortedSet;
+
 RdbPersistence.prototype._serializeValue = function (value, type) {
     if (type === 'hash' && value instanceof Map) {
         return Array.from(value.entries());
@@ -162,11 +191,21 @@ RdbPersistence.prototype._serializeValue = function (value, type) {
     if (type === 'set' && value instanceof Set) {
         return Array.from(value);
     }
-    if (type === 'zset' && value && value.members instanceof Map) {
-        return {
-            members: Array.from(value.members.entries()),
-            sorted: value.sorted
-        };
+    if (type === 'list') {
+        if (value && typeof value.toArray === 'function') {
+            return value.toArray();
+        }
+        if (Array.isArray(value)) return value;
+    }
+    if (type === 'zset') {
+        if (value instanceof SortedSet || (value && typeof value.range === 'function')) {
+            return value.range(0, -1, true);
+        }
+        if (value && value.members instanceof Map) {
+            return Array.from(value.members.entries()).map(function (e) {
+                return { member: e[0], score: e[1] };
+            });
+        }
     }
     return value;
 };
@@ -178,11 +217,29 @@ RdbPersistence.prototype._deserializeValue = function (value, type) {
     if (type === 'set' && Array.isArray(value)) {
         return new Set(value);
     }
-    if (type === 'zset' && value && Array.isArray(value.members)) {
-        return {
-            members: new Map(value.members),
-            sorted: value.sorted || []
-        };
+    if (type === 'list') {
+        return value;
+    }
+    if (type === 'zset') {
+        var zs = new SortedSet();
+        if (Array.isArray(value)) {
+            for (var j = 0; j < value.length; j++) {
+                var item = value[j];
+                if (item.member !== undefined) {
+                    zs.add(item.member, item.score);
+                } else if (Array.isArray(item)) {
+                    zs.add(item[0], item[1]);
+                }
+            }
+            return zs;
+        }
+        if (value && Array.isArray(value.members)) {
+            for (var k = 0; k < value.members.length; k++) {
+                var pair = value.members[k];
+                zs.add(pair[0], pair[1]);
+            }
+            return zs;
+        }
     }
     return value;
 };

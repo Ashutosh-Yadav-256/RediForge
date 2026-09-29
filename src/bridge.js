@@ -14,7 +14,7 @@ var { AuditLogger } = require('./security/audit_logger');
 var { parseAndValidateUrl, validateAndResolveUrl } = require('./utils/url_guard');
 
 var WS_MAGIC = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
-var MAX_WS_BUFFER = 16 * 1024 * 1024; // 16 MB max WebSocket buffer
+var MAX_WS_BUFFER = 16 * 1024 * 1024;
 
 var CORS_ALLOWED_ORIGINS = (function () {
     var envOrigins = process.env.CORS_ALLOWED_ORIGINS;
@@ -76,7 +76,7 @@ WebSocketBridge.prototype._readBody = function (req) {
         var body = '';
         req.on('data', function (chunk) {
             body += chunk;
-            if (body.length > 1048576) { // 1MB limit
+            if (body.length > 1048576) {
                 req.destroy();
                 reject(new Error('Payload too large'));
             }
@@ -207,7 +207,7 @@ WebSocketBridge.prototype._handleHttp = async function (req, res) {
             }
 
             var validation = await validateAndResolveUrl(targetUrl, {
-                allowPrivate: false // Block all internal targets / SSRF
+                allowPrivate: false
             });
 
             if (!validation.valid) {
@@ -614,14 +614,16 @@ WebSocketBridge.prototype._handleMessage = function (client, text) {
         client.role = 'admin';
     }
 
-    if (this._redis.aof && execResult.ctx) {
-        var ctx = execResult.ctx;
-        if (ctx.aofBuffer && ctx.aofBuffer.length > 0) {
-            for (var j = 0; j < ctx.aofBuffer.length; j++) {
-                this._redis.aof.appendCommand(ctx.aofBuffer[j]);
+    if (!this._redis.store || !this._redis.store.mutationEngine) {
+        if (this._redis.aof && execResult.ctx) {
+            var ctx = execResult.ctx;
+            if (ctx.aofBuffer && ctx.aofBuffer.length > 0) {
+                for (var j = 0; j < ctx.aofBuffer.length; j++) {
+                    this._redis.aof.appendCommand(ctx.aofBuffer[j]);
+                }
+            } else if (registry.isWriteCommand(cmdName)) {
+                this._redis.aof.appendCommand(cmdParts);
             }
-        } else if (registry.isWriteCommand(cmdName)) {
-            this._redis.aof.appendCommand(cmdParts);
         }
     }
 

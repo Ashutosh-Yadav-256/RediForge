@@ -7,7 +7,7 @@ var validate = require('../utils/validate');
 function cmdSet(args, ctx) {
     if (args.length < 2) return encoder.wrongArgCount('set');
 
-    var key = args[0];
+    var key = typeof args[0] === 'string' ? args[0] : String(args[0]);
     var value = args[1];
 
     var exMs = null;
@@ -18,7 +18,7 @@ function cmdSet(args, ctx) {
 
     var i = 2;
     while (i < args.length) {
-        var flag = args[i].toUpperCase();
+        var flag = String(args[i]).toUpperCase();
         switch (flag) {
             case 'EX': {
                 if (i + 1 >= args.length) return encoder.syntaxError();
@@ -79,7 +79,10 @@ function cmdSet(args, ctx) {
 
     var prevExpiry = keepTtl ? store.expiry.getExpiry(db, key) : -1;
 
-    store.set(db, key, value, TYPE_STRING);
+    var ok = store.set(db, key, value, TYPE_STRING);
+    if (!ok) {
+        return encoder.oom();
+    }
 
     if (exMs !== null && exMs <= 0) {
         store.deleteKey(db, key);
@@ -101,7 +104,7 @@ function cmdSet(args, ctx) {
 function cmdGet(args, ctx) {
     if (args.length !== 1) return encoder.wrongArgCount('get');
 
-    var key = args[0];
+    var key = typeof args[0] === 'string' ? args[0] : String(args[0]);
     if (!ctx.store.checkType(ctx.db, key, TYPE_STRING)) {
         return encoder.wrongType();
     }
@@ -131,9 +134,22 @@ function cmdMget(args, ctx) {
 function cmdMset(args, ctx) {
     if (args.length < 2 || args.length % 2 !== 0) return encoder.wrongArgCount('mset');
 
+    var totalDelta = 0;
     for (var i = 0; i < args.length; i += 2) {
-        ctx.store.set(ctx.db, args[i], args[i + 1], TYPE_STRING);
-        ctx.store.expiry.removeExpiry(ctx.db, args[i]);
+        var k = args[i];
+        var v = args[i + 1];
+        var newMem = Buffer.byteLength(String(k)) + 48 + Buffer.byteLength(String(v)) + 16;
+        var oldMem = ctx.store._keyMemories[ctx.db].get(k) || 0;
+        totalDelta += (newMem - oldMem);
+    }
+
+    if (totalDelta > 0 && ctx.store.enforceMemoryLimit(totalDelta)) {
+        return encoder.oom();
+    }
+
+    for (var j = 0; j < args.length; j += 2) {
+        ctx.store.set(ctx.db, args[j], args[j + 1], TYPE_STRING);
+        ctx.store.expiry.removeExpiry(ctx.db, args[j]);
     }
 
     return encoder.ok();
@@ -148,7 +164,8 @@ function cmdSetnx(args, ctx) {
         return encoder.integerReply(0);
     }
 
-    ctx.store.set(ctx.db, key, args[1], TYPE_STRING);
+    var ok = ctx.store.set(ctx.db, key, args[1], TYPE_STRING);
+    if (!ok) return encoder.oom();
     return encoder.integerReply(1);
 }
 
@@ -211,7 +228,8 @@ function cmdIncrbyfloat(args, ctx) {
     var result = current + increment;
     if (!isFinite(result)) return encoder.encodeError('ERR increment would produce NaN or Infinity');
     var strResult = String(result);
-    ctx.store.set(ctx.db, key, strResult, TYPE_STRING);
+    var ok = ctx.store.set(ctx.db, key, strResult, TYPE_STRING);
+    if (!ok) return encoder.oom();
 
     return encoder.encodeBulkString(strResult);
 }
@@ -241,7 +259,8 @@ function incrByGeneric(args, ctx, delta, cmdName) {
         return encoder.encodeError('ERR increment or decrement would overflow');
     }
 
-    ctx.store.set(ctx.db, key, result.toString(), TYPE_STRING);
+    var ok = ctx.store.set(ctx.db, key, result.toString(), TYPE_STRING);
+    if (!ok) return encoder.oom();
 
     return encoder.integerReply(result);
 }
@@ -260,7 +279,8 @@ function cmdAppend(args, ctx) {
     }
 
     var newVal = current + args[1];
-    ctx.store.set(ctx.db, key, newVal, TYPE_STRING);
+    var ok = ctx.store.set(ctx.db, key, newVal, TYPE_STRING);
+    if (!ok) return encoder.oom();
 
     return encoder.integerReply(Buffer.byteLength(newVal));
 }

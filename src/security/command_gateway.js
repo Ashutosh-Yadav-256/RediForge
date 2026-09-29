@@ -10,7 +10,7 @@ class RateLimiter {
     constructor(capacity = 100, refillRatePerSec = 50) {
         this.capacity = capacity;
         this.refillRate = refillRatePerSec;
-        this.buckets = new Map(); // key -> { tokens, lastRefill }
+        this.buckets = new Map();
     }
 
     consume(key, tokens = 1) {
@@ -143,7 +143,18 @@ class CommandGateway {
         }
 
         if (!isPreAuthAllowed) {
-            const userRole = clientContext.role || (clientContext.authenticated ? 'developer' : 'viewer');
+            let userRole = clientContext.role;
+            if (!userRole) {
+                if (needsAuth) {
+                    userRole = 'viewer';
+                } else if (clientContext.authenticated) {
+                    userRole = 'admin';
+                } else if (clientContext.userId) {
+                    userRole = 'developer';
+                } else {
+                    userRole = 'admin';
+                }
+            }
             const requiredPerm = rbac.getRequiredPermission(cmdName);
 
             if (!rbac.hasPermission(userRole, requiredPerm)) {
@@ -192,6 +203,7 @@ class CommandGateway {
 
         const ctx = {
             db: clientContext.db !== undefined ? clientContext.db : 0,
+            server: this.server,
             store: this.server.store,
             config: this.server.config,
             connection: clientContext,

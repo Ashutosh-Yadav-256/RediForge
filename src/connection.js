@@ -52,37 +52,25 @@ ClientConnection.prototype._onData = function (chunk) {
 
         var cmdName = String(parsed[0]).toLowerCase();
 
-        if (this._needsAuth() && !PRE_AUTH_ALLOWED[cmdName]) {
-            this.write(encoder.encodeError('NOAUTH Authentication required.'));
-            continue;
-        }
-
-        var ctx = {
-            db: this.db,
-            store: this.server.store,
-            config: this.server.config,
-            connection: this,
-            pubsub: this.server.pubsub,
-            clientCount: this.server.clientCount,
-            aofBuffer: null
-        };
-
         var inTransaction = this.txQueue !== null;
         var isTxControl = cmdName === 'multi' || cmdName === 'exec' || cmdName === 'discard';
 
-        var response = registry.dispatch(parsed, ctx);
+        var gatewayResult = this.server.gateway.execute(parsed, this);
 
-        if (response !== null && response !== undefined) {
-            this.write(response);
+        if (gatewayResult.response !== null && gatewayResult.response !== undefined) {
+            this.write(gatewayResult.response);
         }
 
-        if (this.server.aof) {
-            if (ctx.aofBuffer && ctx.aofBuffer.length > 0) {
-                for (var j = 0; j < ctx.aofBuffer.length; j++) {
-                    this.server.aof.appendCommand(ctx.aofBuffer[j]);
+        if (!this.server.store || !this.server.store.mutationEngine) {
+            if (this.server.aof && gatewayResult.status === 'OK') {
+                var ctx = gatewayResult.ctx;
+                if (ctx && ctx.aofBuffer && ctx.aofBuffer.length > 0) {
+                    for (var j = 0; j < ctx.aofBuffer.length; j++) {
+                        this.server.aof.appendCommand(ctx.aofBuffer[j]);
+                    }
+                } else if (!inTransaction && !isTxControl && registry.isWriteCommand(cmdName)) {
+                    this.server.aof.appendCommand(parsed);
                 }
-            } else if (!inTransaction && !isTxControl && registry.isWriteCommand(cmdName)) {
-                this.server.aof.appendCommand(parsed);
             }
         }
 

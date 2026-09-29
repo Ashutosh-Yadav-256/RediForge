@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "seed": "node seed_demo_keys.js",
-    "test": "node --test tests/protocol.test.js tests/commands.test.js tests/expiry.test.js tests/persistence.test.js tests/integration.test.js tests/security.test.js"
+    "test": "node --test tests/protocol.test.js tests/commands.test.js tests/expiry.test.js tests/persistence.test.js tests/integration.test.js tests/security.test.js tests/correctness.test.js tests/recovery.test.js tests/replication.test.js"
   },
   "keywords": [
     "redis",

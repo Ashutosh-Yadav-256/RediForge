@@ -33,7 +33,7 @@ class AuditLogger {
             remoteAddr: event.remoteAddr || 'unknown',
             command: event.command ? event.command.toUpperCase() : 'UNKNOWN',
             args: this.sanitizeArgs(event.command, event.args),
-            status: event.status || 'ALLOWED', // ALLOWED, DENIED, ERROR
+            status: event.status || 'ALLOWED',
             reason: event.reason || null,
             durationMs: event.durationMs !== undefined ? event.durationMs : 0
         };

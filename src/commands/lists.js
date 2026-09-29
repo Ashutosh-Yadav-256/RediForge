@@ -6,79 +6,62 @@ var validate = require('../utils/validate');
 
 function cmdLpush(args, ctx) {
     if (args.length < 2) return encoder.wrongArgCount('lpush');
-    if (!ctx.store.checkType(ctx.db, args[0], TYPE_LIST)) return encoder.wrongType();
-
-    var arr = ctx.store.get(ctx.db, args[0]);
-    if (arr === undefined) arr = [];
-
-    for (var i = 1; i < args.length; i++) {
-        arr.unshift(args[i]);
+    var elements = [];
+    for (var i = 1; i < args.length; i++) elements.push(args[i]);
+    var res = ctx.store.listPushLeft(ctx.db, args[0], elements);
+    if (!res.ok) {
+        if (res.err === 'WRONGTYPE') return encoder.wrongType();
+        return encoder.oom();
     }
-
-    ctx.store.set(ctx.db, args[0], arr, TYPE_LIST);
-    return encoder.integerReply(arr.length);
+    return encoder.integerReply(res.length);
 }
 
 function cmdRpush(args, ctx) {
     if (args.length < 2) return encoder.wrongArgCount('rpush');
-    if (!ctx.store.checkType(ctx.db, args[0], TYPE_LIST)) return encoder.wrongType();
-
-    var arr = ctx.store.get(ctx.db, args[0]);
-    if (arr === undefined) arr = [];
-
-    for (var i = 1; i < args.length; i++) {
-        arr.push(args[i]);
+    var elements = [];
+    for (var i = 1; i < args.length; i++) elements.push(args[i]);
+    var res = ctx.store.listPushRight(ctx.db, args[0], elements);
+    if (!res.ok) {
+        if (res.err === 'WRONGTYPE') return encoder.wrongType();
+        return encoder.oom();
     }
-
-    ctx.store.set(ctx.db, args[0], arr, TYPE_LIST);
-    return encoder.integerReply(arr.length);
+    return encoder.integerReply(res.length);
 }
 
 function cmdLpop(args, ctx) {
     if (args.length < 1 || args.length > 2) return encoder.wrongArgCount('lpop');
-    if (!ctx.store.checkType(ctx.db, args[0], TYPE_LIST)) return encoder.wrongType();
-
-    var arr = ctx.store.get(ctx.db, args[0]);
-    if (!arr || arr.length === 0) return encoder.nullBulk();
 
     if (args.length === 2) {
         var count = validate.strictParseInt(args[1]);
         if (count === null || count < 0) return encoder.encodeError('ERR value is not an integer or out of range');
-        var items = arr.splice(0, count);
-        ctx.store.markDirty(ctx.db, args[0]);
-        if (arr.length === 0) ctx.store.deleteKey(ctx.db, args[0]);
-        return encoder.encodeArray(items);
+        var res = ctx.store.listPopLeft(ctx.db, args[0], count);
+        if (!res.ok) return encoder.wrongType();
+        if (res.values.length === 0) return encoder.nullBulk();
+        return encoder.encodeArray(res.values);
     }
 
-    var val = arr.shift();
-    ctx.store.markDirty(ctx.db, args[0]);
-    if (arr.length === 0) ctx.store.deleteKey(ctx.db, args[0]);
-    return encoder.encodeBulkString(val);
+    var resSingle = ctx.store.listPopLeft(ctx.db, args[0], 1);
+    if (!resSingle.ok) return encoder.wrongType();
+    if (resSingle.values.length === 0) return encoder.nullBulk();
+    return encoder.encodeBulkString(resSingle.values[0]);
 }
 
 function cmdRpop(args, ctx) {
     if (args.length < 1 || args.length > 2) return encoder.wrongArgCount('rpop');
-    if (!ctx.store.checkType(ctx.db, args[0], TYPE_LIST)) return encoder.wrongType();
-
-    var arr = ctx.store.get(ctx.db, args[0]);
-    if (!arr || arr.length === 0) return encoder.nullBulk();
 
     if (args.length === 2) {
         var count = validate.strictParseInt(args[1]);
         if (count === null || count < 0) return encoder.encodeError('ERR value is not an integer or out of range');
-        var items = [];
-        for (var i = 0; i < count && arr.length > 0; i++) {
-            items.push(arr.pop());
-        }
-        ctx.store.markDirty(ctx.db, args[0]);
-        if (arr.length === 0) ctx.store.deleteKey(ctx.db, args[0]);
-        return encoder.encodeArray(items);
+        var res = ctx.store.listPopRight(ctx.db, args[0], count);
+        if (!res.ok) return encoder.wrongType();
+        if (res.values.length === 0) return encoder.nullBulk();
+        return encoder.encodeArray(res.values);
     }
 
-    var val = arr.pop();
-    ctx.store.markDirty(ctx.db, args[0]);
-    if (arr.length === 0) ctx.store.deleteKey(ctx.db, args[0]);
-    return encoder.encodeBulkString(val);
+    var resSingle = ctx.store.listPopRight(ctx.db, args[0], 1);
+    if (!resSingle.ok) return encoder.wrongType();
+    if (resSingle.values.length === 0) return encoder.nullBulk();
+    return encoder.encodeBulkString(resSingle.values[0]);
 }
 
 function cmdLlen(args, ctx) {
@@ -123,7 +106,8 @@ function cmdLindex(args, ctx) {
     if (index < 0) index = arr.length + index;
     if (index < 0 || index >= arr.length) return encoder.nullBulk();
 
-    return encoder.encodeBulkString(arr[index]);
+    var item = typeof arr.get === 'function' ? arr.get(index) : arr[index];
+    return encoder.encodeBulkString(item);
 }
 
 function cmdLset(args, ctx) {
@@ -139,7 +123,11 @@ function cmdLset(args, ctx) {
     if (index < 0) index = arr.length + index;
     if (index < 0 || index >= arr.length) return encoder.encodeError('ERR index out of range');
 
-    arr[index] = args[2];
+    if (typeof arr.set === 'function') {
+        arr.set(index, args[2]);
+    } else {
+        arr[index] = args[2];
+    }
     ctx.store.markDirty(ctx.db, args[0]);
     return encoder.ok();
 }
@@ -149,7 +137,7 @@ function cmdLrem(args, ctx) {
     if (!ctx.store.checkType(ctx.db, args[0], TYPE_LIST)) return encoder.wrongType();
 
     var arr = ctx.store.get(ctx.db, args[0]);
-    if (!arr) return encoder.integerReply(0);
+    if (!arr || arr.length === 0) return encoder.integerReply(0);
 
     var count = validate.strictParseInt(args[1]);
     if (count === null) return encoder.encodeError('ERR value is not an integer or out of range');
@@ -157,29 +145,50 @@ function cmdLrem(args, ctx) {
     var value = args[2];
     var removed = 0;
 
-    if (count > 0) {
-        for (var i = 0; i < arr.length && removed < count; ) {
-            if (arr[i] === value) {
-                arr.splice(i, 1);
-                removed++;
-            } else {
-                i++;
+    if (typeof arr.remove === 'function') {
+        if (count >= 0) {
+            removed = arr.remove(value, count);
+        } else {
+            var limit = Math.abs(count);
+            var kept = [];
+            for (var ri = arr.length - 1; ri >= 0; ri--) {
+                var el = arr.get(ri);
+                if (el === value && removed < limit) {
+                    removed++;
+                } else {
+                    kept.unshift(el);
+                }
             }
-        }
-    } else if (count < 0) {
-        var limit = Math.abs(count);
-        for (var j = arr.length - 1; j >= 0 && removed < limit; ) {
-            if (arr[j] === value) {
-                arr.splice(j, 1);
-                removed++;
+            if (removed > 0) {
+                arr._clear();
+                for (var ki = 0; ki < kept.length; ki++) arr.pushRight(kept[ki]);
             }
-            j--;
         }
     } else {
-        for (var k = arr.length - 1; k >= 0; k--) {
-            if (arr[k] === value) {
-                arr.splice(k, 1);
-                removed++;
+        if (count > 0) {
+            for (var i = 0; i < arr.length && removed < count; ) {
+                if (arr[i] === value) {
+                    arr.splice(i, 1);
+                    removed++;
+                } else {
+                    i++;
+                }
+            }
+        } else if (count < 0) {
+            var limit = Math.abs(count);
+            for (var j = arr.length - 1; j >= 0 && removed < limit; ) {
+                if (arr[j] === value) {
+                    arr.splice(j, 1);
+                    removed++;
+                }
+                j--;
+            }
+        } else {
+            for (var k = arr.length - 1; k >= 0; k--) {
+                if (arr[k] === value) {
+                    arr.splice(k, 1);
+                    removed++;
+                }
             }
         }
     }
@@ -213,10 +222,14 @@ function cmdLpos(args, ctx) {
     var matches = 0;
     var scanLimit = maxlen > 0 ? Math.min(maxlen, arr.length) : arr.length;
 
+    function getItem(idx) {
+        return typeof arr.get === 'function' ? arr.get(idx) : arr[idx];
+    }
+
     if (rank > 0) {
         var skip = rank - 1;
         for (var si = 0; si < scanLimit; si++) {
-            if (arr[si] === element) {
+            if (getItem(si) === element) {
                 if (skip > 0) { skip--; continue; }
                 results.push(si);
                 matches++;
@@ -226,7 +239,7 @@ function cmdLpos(args, ctx) {
     } else {
         var skipRev = Math.abs(rank) - 1;
         for (var ri = arr.length - 1; ri >= Math.max(0, arr.length - scanLimit); ri--) {
-            if (arr[ri] === element) {
+            if (getItem(ri) === element) {
                 if (skipRev > 0) { skipRev--; continue; }
                 results.push(ri);
                 matches++;

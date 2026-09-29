@@ -7,19 +7,17 @@ var validate = require('../utils/validate');
 function cmdHset(args, ctx) {
     if (args.length < 3 || (args.length - 1) % 2 !== 0) return encoder.wrongArgCount('hset');
 
-    if (!ctx.store.checkType(ctx.db, args[0], TYPE_HASH)) return encoder.wrongType();
-
-    var map = ctx.store.get(ctx.db, args[0]);
-    if (map === undefined) map = new Map();
-
-    var added = 0;
+    var pairs = [];
     for (var i = 1; i < args.length; i += 2) {
-        if (!map.has(args[i])) added++;
-        map.set(args[i], args[i + 1]);
+        pairs.push([args[i], args[i + 1]]);
     }
 
-    ctx.store.set(ctx.db, args[0], map, TYPE_HASH);
-    return encoder.integerReply(added);
+    var res = ctx.store.hashSet(ctx.db, args[0], pairs);
+    if (!res.ok) {
+        if (res.err === 'WRONGTYPE') return encoder.wrongType();
+        return encoder.oom();
+    }
+    return encoder.integerReply(res.added);
 }
 
 function cmdHget(args, ctx) {
@@ -36,19 +34,15 @@ function cmdHget(args, ctx) {
 
 function cmdHdel(args, ctx) {
     if (args.length < 2) return encoder.wrongArgCount('hdel');
-    if (!ctx.store.checkType(ctx.db, args[0], TYPE_HASH)) return encoder.wrongType();
 
-    var map = ctx.store.get(ctx.db, args[0]);
-    if (!map) return encoder.integerReply(0);
-
-    var removed = 0;
+    var fields = [];
     for (var i = 1; i < args.length; i++) {
-        if (map.delete(args[i])) removed++;
+        fields.push(args[i]);
     }
 
-    if (removed > 0) ctx.store.markDirty(ctx.db, args[0]);
-    if (map.size === 0) ctx.store.deleteKey(ctx.db, args[0]);
-    return encoder.integerReply(removed);
+    var res = ctx.store.hashDelete(ctx.db, args[0], fields);
+    if (!res.ok) return encoder.wrongType();
+    return encoder.integerReply(res.removed);
 }
 
 function cmdHgetall(args, ctx) {
@@ -69,16 +63,17 @@ function cmdHgetall(args, ctx) {
 
 function cmdHmset(args, ctx) {
     if (args.length < 3 || (args.length - 1) % 2 !== 0) return encoder.wrongArgCount('hmset');
-    if (!ctx.store.checkType(ctx.db, args[0], TYPE_HASH)) return encoder.wrongType();
 
-    var map = ctx.store.get(ctx.db, args[0]);
-    if (map === undefined) map = new Map();
-
+    var pairs = [];
     for (var i = 1; i < args.length; i += 2) {
-        map.set(args[i], args[i + 1]);
+        pairs.push([args[i], args[i + 1]]);
     }
 
-    ctx.store.set(ctx.db, args[0], map, TYPE_HASH);
+    var res = ctx.store.hashSet(ctx.db, args[0], pairs);
+    if (!res.ok) {
+        if (res.err === 'WRONGTYPE') return encoder.wrongType();
+        return encoder.oom();
+    }
     return encoder.ok();
 }
 
@@ -144,9 +139,7 @@ function cmdHincrby(args, ctx) {
     if (increment === null) return encoder.encodeError('ERR value is not an integer or out of range');
 
     var map = ctx.store.get(ctx.db, args[0]);
-    if (map === undefined) map = new Map();
-
-    var current = map.get(args[1]);
+    var current = map ? map.get(args[1]) : undefined;
     var currentBig;
     if (current === undefined) {
         currentBig = 0n;
@@ -160,8 +153,11 @@ function cmdHincrby(args, ctx) {
         return encoder.encodeError('ERR increment or decrement would overflow');
     }
 
-    map.set(args[1], result.toString());
-    ctx.store.set(ctx.db, args[0], map, TYPE_HASH);
+    var res = ctx.store.hashSet(ctx.db, args[0], [[args[1], result.toString()]]);
+    if (!res.ok) {
+        if (res.err === 'WRONGTYPE') return encoder.wrongType();
+        return encoder.oom();
+    }
 
     return encoder.integerReply(result);
 }
@@ -174,21 +170,24 @@ function cmdHincrbyfloat(args, ctx) {
     if (increment === null || !isFinite(increment)) return encoder.encodeError('ERR value is not a valid float');
 
     var map = ctx.store.get(ctx.db, args[0]);
-    if (map === undefined) map = new Map();
-
-    var current = map.get(args[1]);
+    var current = map ? map.get(args[1]) : undefined;
+    var currentNum;
     if (current === undefined) {
-        current = 0;
+        currentNum = 0;
     } else {
-        current = validate.strictParseFloat(current);
-        if (current === null || !isFinite(current)) return encoder.encodeError('ERR hash value is not a float');
+        currentNum = validate.strictParseFloat(current);
+        if (currentNum === null || !isFinite(currentNum)) return encoder.encodeError('ERR hash value is not a float');
     }
 
-    var result = current + increment;
+    var result = currentNum + increment;
     if (!isFinite(result)) return encoder.encodeError('ERR increment would produce NaN or Infinity');
     var strResult = String(result);
-    map.set(args[1], strResult);
-    ctx.store.set(ctx.db, args[0], map, TYPE_HASH);
+
+    var res = ctx.store.hashSet(ctx.db, args[0], [[args[1], strResult]]);
+    if (!res.ok) {
+        if (res.err === 'WRONGTYPE') return encoder.wrongType();
+        return encoder.oom();
+    }
 
     return encoder.encodeBulkString(strResult);
 }
@@ -198,12 +197,13 @@ function cmdHsetnx(args, ctx) {
     if (!ctx.store.checkType(ctx.db, args[0], TYPE_HASH)) return encoder.wrongType();
 
     var map = ctx.store.get(ctx.db, args[0]);
-    if (map === undefined) map = new Map();
+    if (map && map.has(args[1])) return encoder.integerReply(0);
 
-    if (map.has(args[1])) return encoder.integerReply(0);
-
-    map.set(args[1], args[2]);
-    ctx.store.set(ctx.db, args[0], map, TYPE_HASH);
+    var res = ctx.store.hashSet(ctx.db, args[0], [[args[1], args[2]]]);
+    if (!res.ok) {
+        if (res.err === 'WRONGTYPE') return encoder.wrongType();
+        return encoder.oom();
+    }
     return encoder.integerReply(1);
 }
 

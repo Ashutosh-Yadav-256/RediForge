@@ -3,11 +3,27 @@
 const CRLF = '\r\n';
 const CR = 0x0d;
 const LF = 0x0a;
-const MAX_PARSER_BUFFER = 64 * 1024 * 1024; // 64 MB max parser buffer
+const MAX_PARSER_BUFFER = 64 * 1024 * 1024;
+const MAX_BULK_SIZE = 512 * 1024 * 1024;
+const MAX_ARRAY_ELEMENTS = 1024 * 1024;
+const MAX_NESTING_DEPTH = 16;
+
+function parseStrictInteger(str) {
+    if (!/^-?\d+$/.test(str)) {
+        return null;
+    }
+    const val = Number(str);
+    if (!Number.isSafeInteger(val)) {
+        return null;
+    }
+    return val;
+}
 
 class RespParser {
-    constructor() {
+    constructor(options) {
+        const opts = options || {};
         this._buffer = Buffer.alloc(0);
+        this._returnBuffers = !!opts.returnBuffers;
     }
 
     append(chunk) {
@@ -23,7 +39,7 @@ class RespParser {
         let parsed;
 
         while (this._buffer.length > 0) {
-            parsed = this._tryParse();
+            parsed = this._tryParse(0);
             if (parsed === null) {
                 break;
             }
@@ -34,7 +50,7 @@ class RespParser {
         return results;
     }
 
-    _tryParse() {
+    _tryParse(depth = 0) {
         if (this._buffer.length === 0) return null;
 
         const type = this._buffer[0];
@@ -44,7 +60,7 @@ class RespParser {
             case 0x2d: return this._parseError();
             case 0x3a: return this._parseInteger();
             case 0x24: return this._parseBulkString();
-            case 0x2a: return this._parseArray();
+            case 0x2a: return this._parseArray(depth);
             default:   return this._parseInline();
         }
     }
@@ -75,7 +91,11 @@ class RespParser {
     _parseInteger() {
         const end = this._findCRLF(1);
         if (end < 0) return null;
-        const num = parseInt(this._buffer.toString('utf8', 1, end), 10);
+        const raw = this._buffer.toString('utf8', 1, end);
+        const num = parseStrictInteger(raw);
+        if (num === null) {
+            throw new Error('Protocol error: invalid integer ' + raw);
+        }
         return { value: num, consumed: end + 2 };
     }
 
@@ -83,7 +103,11 @@ class RespParser {
         const lenEnd = this._findCRLF(1);
         if (lenEnd < 0) return null;
 
-        const len = parseInt(this._buffer.toString('utf8', 1, lenEnd), 10);
+        const rawLen = this._buffer.toString('utf8', 1, lenEnd);
+        const len = parseStrictInteger(rawLen);
+        if (len === null || len < -1 || len > MAX_BULK_SIZE) {
+            throw new Error('Protocol error: invalid bulk length ' + rawLen);
+        }
 
         if (len === -1) {
             return { value: null, consumed: lenEnd + 2 };
@@ -94,15 +118,30 @@ class RespParser {
 
         if (this._buffer.length < dataEnd + 2) return null;
 
-        const str = this._buffer.toString('utf8', dataStart, dataEnd);
-        return { value: str, consumed: dataEnd + 2 };
+        if (this._buffer[dataEnd] !== CR || this._buffer[dataEnd + 1] !== LF) {
+            throw new Error('Protocol error: bulk string missing CRLF terminator');
+        }
+
+        const val = this._returnBuffers
+            ? this._buffer.subarray(dataStart, dataEnd)
+            : this._buffer.toString('utf8', dataStart, dataEnd);
+
+        return { value: val, consumed: dataEnd + 2 };
     }
 
-    _parseArray() {
+    _parseArray(depth = 0) {
+        if (depth > MAX_NESTING_DEPTH) {
+            throw new Error('Protocol error: max array nesting depth exceeded');
+        }
+
         const lenEnd = this._findCRLF(1);
         if (lenEnd < 0) return null;
 
-        const count = parseInt(this._buffer.toString('utf8', 1, lenEnd), 10);
+        const rawCount = this._buffer.toString('utf8', 1, lenEnd);
+        const count = parseStrictInteger(rawCount);
+        if (count === null || count < -1 || count > MAX_ARRAY_ELEMENTS) {
+            throw new Error('Protocol error: invalid multibulk length ' + rawCount);
+        }
 
         if (count === -1) {
             return { value: null, consumed: lenEnd + 2 };
@@ -118,7 +157,7 @@ class RespParser {
 
         const elements = [];
         for (let i = 0; i < count; i++) {
-            const element = this._tryParse();
+            const element = this._tryParse(depth + 1);
             if (element === null) {
                 this._buffer = saved;
                 return null;

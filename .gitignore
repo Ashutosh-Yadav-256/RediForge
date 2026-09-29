@@ -37,3 +37,7 @@ repos/
 desktop/dist/
 desktop/release/
 
+# Agent skills & local tools
+SKILLS/
+.agents/
+

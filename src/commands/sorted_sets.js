@@ -72,63 +72,36 @@ function cmdZadd(args, ctx) {
         return encoder.syntaxError();
     }
 
-    var zs = ctx.store.get(ctx.db, key);
-    if (zs === undefined) zs = { members: new Map(), sorted: [] };
-
-    var added = 0;
-    var changed = 0;
-
+    var items = [];
     for (; i < args.length; i += 2) {
         var score = validate.strictParseFloat(args[i]);
         var member = args[i + 1];
 
         if (score === null) return encoder.encodeError('ERR value is not a valid float');
-
-        if (zs.members.has(member)) {
-            if (nx) continue;
-            var oldScore = zs.members.get(member);
-
-            var update = true;
-            if (gt && score <= oldScore) update = false;
-            if (lt && score >= oldScore) update = false;
-
-            if (update && score !== oldScore) {
-                removeSorted(zs, member);
-                zs.members.set(member, score);
-                insertSorted(zs, member, score);
-                changed++;
-            }
-        } else {
-            if (xx) continue;
-            zs.members.set(member, score);
-            insertSorted(zs, member, score);
-            added++;
-        }
+        items.push({ score: score, member: member });
     }
 
-    ctx.store.set(ctx.db, key, zs, TYPE_ZSET);
-    return encoder.integerReply(ch ? added + changed : added);
+    var res = ctx.store.zsetAdd(ctx.db, key, items, { nx, xx, gt, lt, ch });
+    if (!res.ok) {
+        if (res.err === 'WRONGTYPE') return encoder.wrongType();
+        return encoder.oom();
+    }
+
+    return encoder.integerReply(ch ? res.added + res.changed : res.added);
 }
 
 function cmdZrem(args, ctx) {
     if (args.length < 2) return encoder.wrongArgCount('zrem');
     if (!ctx.store.checkType(ctx.db, args[0], TYPE_ZSET)) return encoder.wrongType();
 
-    var zs = ctx.store.get(ctx.db, args[0]);
-    if (!zs) return encoder.integerReply(0);
-
-    var removed = 0;
+    var members = [];
     for (var i = 1; i < args.length; i++) {
-        if (zs.members.has(args[i])) {
-            removeSorted(zs, args[i]);
-            zs.members.delete(args[i]);
-            removed++;
-        }
+        members.push(args[i]);
     }
 
-    if (removed > 0) ctx.store.markDirty(ctx.db, args[0]);
-    if (zs.members.size === 0) ctx.store.deleteKey(ctx.db, args[0]);
-    return encoder.integerReply(removed);
+    var res = ctx.store.zsetRemove(ctx.db, args[0], members);
+    if (!res.ok) return encoder.wrongType();
+    return encoder.integerReply(res.removed);
 }
 
 function cmdZscore(args, ctx) {
@@ -138,8 +111,8 @@ function cmdZscore(args, ctx) {
     var zs = ctx.store.get(ctx.db, args[0]);
     if (!zs) return encoder.nullBulk();
 
-    var score = zs.members.get(args[1]);
-    if (score === undefined) return encoder.nullBulk();
+    var score = typeof zs.score === 'function' ? zs.score(args[1]) : (zs.members ? zs.members.get(args[1]) : undefined);
+    if (score === undefined || score === null) return encoder.nullBulk();
     return encoder.encodeBulkString(String(score));
 }
 
@@ -149,6 +122,12 @@ function cmdZrank(args, ctx) {
 
     var zs = ctx.store.get(ctx.db, args[0]);
     if (!zs) return encoder.nullBulk();
+
+    if (typeof zs.rank === 'function') {
+        var r = zs.rank(args[1]);
+        if (r === null) return encoder.nullBulk();
+        return encoder.integerReply(r);
+    }
 
     var idx = -1;
     for (var i = 0; i < zs.sorted.length; i++) {
@@ -165,6 +144,12 @@ function cmdZrevrank(args, ctx) {
     var zs = ctx.store.get(ctx.db, args[0]);
     if (!zs) return encoder.nullBulk();
 
+    if (typeof zs.revrank === 'function') {
+        var rr = zs.revrank(args[1]);
+        if (rr === null) return encoder.nullBulk();
+        return encoder.integerReply(rr);
+    }
+
     var idx = -1;
     for (var i = 0; i < zs.sorted.length; i++) {
         if (zs.sorted[i].member === args[1]) { idx = i; break; }
@@ -178,7 +163,8 @@ function cmdZrange(args, ctx) {
     if (!ctx.store.checkType(ctx.db, args[0], TYPE_ZSET)) return encoder.wrongType();
 
     var zs = ctx.store.get(ctx.db, args[0]);
-    if (!zs || zs.sorted.length === 0) return encoder.emptyArray();
+    var len = zs ? (typeof zs.length === 'number' ? zs.length : (zs.sorted ? zs.sorted.length : 0)) : 0;
+    if (len === 0) return encoder.emptyArray();
 
     var start = validate.strictParseInt(args[1]);
     var stop = validate.strictParseInt(args[2]);
@@ -193,9 +179,22 @@ function cmdZrange(args, ctx) {
         else if (flag === 'REV') rev = true;
     }
 
-    var arr = rev ? zs.sorted.slice().reverse() : zs.sorted;
-    var len = arr.length;
+    if (typeof zs.range === 'function') {
+        var items = rev ? zs.revrange(start, stop, withScores) : zs.range(start, stop, withScores);
+        if (!items || items.length === 0) return encoder.emptyArray();
+        var resultArr = [];
+        for (var idx = 0; idx < items.length; idx++) {
+            if (withScores) {
+                resultArr.push(items[idx].member);
+                resultArr.push(String(items[idx].score));
+            } else {
+                resultArr.push(items[idx]);
+            }
+        }
+        return encoder.encodeArray(resultArr);
+    }
 
+    var arr = rev ? zs.sorted.slice().reverse() : zs.sorted;
     if (start < 0) start = Math.max(0, len + start);
     if (stop < 0) stop = len + stop;
     if (start > stop || start >= len) return encoder.emptyArray();
@@ -216,7 +215,8 @@ function cmdZrangebyscore(args, ctx) {
     if (!ctx.store.checkType(ctx.db, args[0], TYPE_ZSET)) return encoder.wrongType();
 
     var zs = ctx.store.get(ctx.db, args[0]);
-    if (!zs || zs.sorted.length === 0) return encoder.emptyArray();
+    var len = zs ? (typeof zs.length === 'number' ? zs.length : (zs.sorted ? zs.sorted.length : 0)) : 0;
+    if (len === 0) return encoder.emptyArray();
 
     var withScores = false;
     var offset = 0, count = -1;
@@ -232,6 +232,27 @@ function cmdZrangebyscore(args, ctx) {
             offset = parseInt(args[++i], 10);
             count = parseInt(args[++i], 10);
         }
+    }
+
+    if (typeof zs.rangeByScore === 'function') {
+        var scoredItems = zs.rangeByScore(minBound.val, maxBound.val, {
+            withScores: withScores,
+            offset: offset,
+            count: count,
+            minExclusive: minBound.exclusive,
+            maxExclusive: maxBound.exclusive
+        });
+        if (!scoredItems || scoredItems.length === 0) return encoder.emptyArray();
+        var outRes = [];
+        for (var j = 0; j < scoredItems.length; j++) {
+            if (withScores) {
+                outRes.push(scoredItems[j].member);
+                outRes.push(String(scoredItems[j].score));
+            } else {
+                outRes.push(scoredItems[j]);
+            }
+        }
+        return encoder.encodeArray(outRes);
     }
 
     var result = [];
@@ -260,7 +281,7 @@ function cmdZcard(args, ctx) {
     if (!ctx.store.checkType(ctx.db, args[0], TYPE_ZSET)) return encoder.wrongType();
 
     var zs = ctx.store.get(ctx.db, args[0]);
-    return encoder.integerReply(zs ? zs.members.size : 0);
+    return encoder.integerReply(zs ? (typeof zs.length === 'number' ? zs.length : (zs.members ? zs.members.size : 0)) : 0);
 }
 
 function cmdZcount(args, ctx) {
@@ -273,6 +294,10 @@ function cmdZcount(args, ctx) {
     var minBound = parseScoreBound(args[1]);
     var maxBound = parseScoreBound(args[2]);
     if (!minBound || !maxBound) return encoder.encodeError('ERR min or max is not a float');
+
+    if (typeof zs.count === 'function') {
+        return encoder.integerReply(zs.count(minBound.val, maxBound.val, minBound.exclusive, maxBound.exclusive));
+    }
 
     var total = 0;
     for (var i = 0; i < zs.sorted.length; i++) {
@@ -296,20 +321,16 @@ function cmdZincrby(args, ctx) {
     var member = args[2];
 
     var zs = ctx.store.get(ctx.db, key);
-    if (zs === undefined) zs = { members: new Map(), sorted: [] };
+    var oldScore = (zs && (typeof zs.score === 'function' ? zs.score(member) !== undefined : (zs.members && zs.members.has(member))))
+        ? (typeof zs.score === 'function' ? zs.score(member) : zs.members.get(member))
+        : 0;
+    var newScore = oldScore + increment;
 
-    var newScore;
-    if (zs.members.has(member)) {
-        var oldScore = zs.members.get(member);
-        newScore = oldScore + increment;
-        removeSorted(zs, member);
-    } else {
-        newScore = increment;
+    var res = ctx.store.zsetAdd(ctx.db, key, [{ member: member, score: newScore }], {});
+    if (!res.ok) {
+        if (res.err === 'WRONGTYPE') return encoder.wrongType();
+        return encoder.oom();
     }
-
-    zs.members.set(member, newScore);
-    insertSorted(zs, member, newScore);
-    ctx.store.set(ctx.db, key, zs, TYPE_ZSET);
 
     return encoder.encodeBulkString(String(newScore));
 }
@@ -319,7 +340,8 @@ function cmdZrevrange(args, ctx) {
     if (!ctx.store.checkType(ctx.db, args[0], TYPE_ZSET)) return encoder.wrongType();
 
     var zs = ctx.store.get(ctx.db, args[0]);
-    if (!zs || zs.sorted.length === 0) return encoder.emptyArray();
+    var len = zs ? (typeof zs.length === 'number' ? zs.length : (zs.sorted ? zs.sorted.length : 0)) : 0;
+    if (len === 0) return encoder.emptyArray();
 
     var start = validate.strictParseInt(args[1]);
     var stop = validate.strictParseInt(args[2]);
@@ -327,9 +349,22 @@ function cmdZrevrange(args, ctx) {
 
     var withScores = args.length > 3 && args[3].toUpperCase() === 'WITHSCORES';
 
-    var reversed = zs.sorted.slice().reverse();
-    var len = reversed.length;
+    if (typeof zs.revrange === 'function') {
+        var items = zs.revrange(start, stop, withScores);
+        if (!items || items.length === 0) return encoder.emptyArray();
+        var resultArr = [];
+        for (var idx = 0; idx < items.length; idx++) {
+            if (withScores) {
+                resultArr.push(items[idx].member);
+                resultArr.push(String(items[idx].score));
+            } else {
+                resultArr.push(items[idx]);
+            }
+        }
+        return encoder.encodeArray(resultArr);
+    }
 
+    var reversed = zs.sorted.slice().reverse();
     if (start < 0) start = Math.max(0, len + start);
     if (stop < 0) stop = len + stop;
     if (start > stop || start >= len) return encoder.emptyArray();

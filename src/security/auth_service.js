@@ -6,7 +6,7 @@ const https = require('https');
 const DEFAULT_SECRET = process.env.REDISGEN_AUTH_SECRET || 'redisgen_zero_cost_secret_' + crypto.randomBytes(16).toString('hex');
 const GOOGLE_OAUTH_CLIENT_ID = process.env.GOOGLE_OAUTH_CLIENT_ID || '';
 const GOOGLE_JWKS_URI = 'https://www.googleapis.com/oauth2/v3/certs';
-const GOOGLE_JWKS_CACHE_TTL_MS = 3600000; // 1 hour
+const GOOGLE_JWKS_CACHE_TTL_MS = 3600000;
 
 function base64UrlEncode(str) {
     return Buffer.from(str)
@@ -101,9 +101,9 @@ class AuthService {
     constructor(secret, options = {}) {
         this.secret = secret || DEFAULT_SECRET;
         this.googleClientId = options.googleClientId || GOOGLE_OAUTH_CLIENT_ID;
-        this.users = new Map(); // userId -> { id, email, name, role, workspaces: Set }
-        this.workspaces = new Map(); // workspaceId -> { id, name, ownerId, members: Map<userId, role> }
-        this.sessions = new Map(); // token -> { userId, workspaceId, expiresAt }
+        this.users = new Map();
+        this.workspaces = new Map();
+        this.sessions = new Map();
         this._jwksCache = null;
         this._jwksCacheTime = 0;
         this._initDefaultAdmin();
@@ -283,7 +283,7 @@ class AuthService {
         const kid = header.kid;
         const jwk = kid
             ? jwks.keys.find(k => k.kid === kid)
-            : jwks.keys[0]; // fallback if no kid in header
+            : jwks.keys[0];
 
         if (!jwk) {
             return { valid: false, error: 'No matching signing key found for kid: ' + kid };
