@@ -894,6 +894,27 @@
         });
     });
 
+    var btnToggleArchView = document.getElementById('btn-toggle-arch-view');
+    if (btnToggleArchView) {
+        btnToggleArchView.addEventListener('click', function () {
+            var interactive = document.getElementById('arch-interactive-container');
+            var ascii = document.getElementById('arch-ascii-container');
+            var txt = document.getElementById('toggle-arch-text');
+            if (ascii && interactive) {
+                var isAsciiHidden = ascii.classList.contains('hidden');
+                if (isAsciiHidden) {
+                    ascii.classList.remove('hidden');
+                    interactive.classList.add('hidden');
+                    if (txt) txt.textContent = 'Show Interactive Canvas';
+                } else {
+                    ascii.classList.add('hidden');
+                    interactive.classList.remove('hidden');
+                    if (txt) txt.textContent = 'Show ASCII Topology';
+                }
+            }
+        });
+    }
+
     if (els.btnCloseSystemStatus) els.btnCloseSystemStatus.addEventListener('click', function () { closeAllModals(true); });
     if (els.btnStatusViewDashboard) els.btnStatusViewDashboard.addEventListener('click', function () {
         closeAllModals(true);

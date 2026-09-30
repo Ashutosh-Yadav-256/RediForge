@@ -21,7 +21,7 @@
 
 <br/>
 
-**[ Live Production Demo: rediforge.in ](https://rediforge.in)** • **[ System Architecture Whitepaper ](ARCHITECTURE.md)**
+**[ Live Production Demo: rediforge.in ](https://rediforge.in)** • **[ System Architecture Whitepaper ](ARCHITECTURE.md)** • **[ Interactive Architecture Diagram (SVG + Trace) ](architecture_diagram.html)**
 
 <br/>
 
@@ -81,6 +81,13 @@
 ## 2. System Architecture & Component Design
 
 RediForge operates an event-driven, non-blocking I/O multiplexing model separating raw wire-protocol ingestion from datastore mutation, persistence, and telemetry dispatch.
+
+> [!TIP]
+> ### Interactive Architecture Diagram (SVG, Trace Motion & Deep Code Links)
+> RediForge features an explorable, standalone **Interactive Architecture Diagram** with dark/light themes, active telemetry trace animation, guided subsystem views, and clickable links to source code files:
+>
+> **[Launch Interactive Architecture Diagram](architecture_diagram.html)**  
+> *(You can also interact with the embedded diagram inside the Web Console under **Architecture & Whitepaper** or visit `http://localhost:8080/architecture_diagram.html`)*
 
 ```
                       +-------------------------------------------------------------+

@@ -145,6 +145,8 @@ WebSocketBridge.prototype._handleHttp = async function (req, res) {
         staticFile = path.join(__dirname, '..', 'frontend', 'llms-full.txt');
     } else if (pathname === '/og-image.png' || pathname === '/og-image.svg') {
         staticFile = path.join(__dirname, '..', 'frontend', 'og-image.svg');
+    } else if (pathname === '/architecture_diagram.html' || pathname === '/architeture_diagram.html') {
+        staticFile = path.join(__dirname, '..', 'frontend', 'architecture_diagram.html');
     }
 
     if (staticFile && fs.existsSync(staticFile)) {

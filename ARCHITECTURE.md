@@ -25,6 +25,13 @@
 
 ## 2. High-Level System Architecture
 
+> [!TIP]
+> ### Interactive Architecture Diagram (SVG + Trace Motion)
+> Explore the live architecture diagram with interactive component inspection, guided subsystem views, and trace motion:  
+> **[Open Interactive Architecture Diagram](architecture_diagram.html)**
+>
+> *(Available within the Web Console under **Architecture & Whitepaper** or standalone at `/architecture_diagram.html`)*
+
 RediForge is composed of four distinct architectural layers operating concurrently on an asynchronous, event-driven event loop:
 
 ```

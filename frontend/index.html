@@ -1103,11 +1103,27 @@
                 </div>
 
                 <div id="arch-tab-architecture" class="space-y-4 hidden">
-                    <div class="p-3 neo-card rounded-xl">
-                        <h4 class="font-bold text-[#2A2F33] text-xs uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-accent-blue">schema</span> High-Level System Architecture Diagram
-                        </h4>
-                        <div class="font-mono text-[10px] bg-[#1E2327] text-[#C4C9D4] p-3 rounded-lg overflow-x-auto leading-relaxed">
+                    <div class="p-3 neo-card rounded-xl space-y-3">
+                        <div class="flex flex-wrap justify-between items-center gap-2 border-b border-[#C4C9D4]/30 pb-2">
+                            <h4 class="font-bold text-[#2A2F33] text-xs uppercase tracking-wider flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-accent-blue">schema</span> Interactive System Architecture Diagram
+                                <span class="text-[10px] lowercase font-mono px-2 py-0.5 rounded bg-accent-green/15 text-accent-green font-bold">Live Trace &amp; SVG</span>
+                            </h4>
+                            <div class="flex items-center gap-2">
+                                <button id="btn-toggle-arch-view" class="neo-button px-2.5 py-1 text-[11px] font-bold text-[#7E8490] hover:text-[#2A2F33] flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-sm">terminal</span> <span id="toggle-arch-text">Show ASCII Topology</span>
+                                </button>
+                                <a href="/architecture_diagram.html" target="_blank" rel="noopener noreferrer" class="neo-button neo-button-primary px-2.5 py-1 text-[11px] font-bold flex items-center gap-1 text-white">
+                                    <span class="material-symbols-outlined text-sm">open_in_new</span> Open Fullscreen
+                                </a>
+                            </div>
+                        </div>
+
+                        <div id="arch-interactive-container" class="w-full rounded-xl overflow-hidden border border-[#C4C9D4]/40 bg-[#0f141c] relative shadow-inner">
+                            <iframe id="iframe-arch-diagram" src="/architecture_diagram.html?embed=1" class="w-full h-[520px] border-0" title="RediForge Interactive Architecture Diagram" loading="lazy"></iframe>
+                        </div>
+
+                        <div id="arch-ascii-container" class="font-mono text-[10px] bg-[#1E2327] text-[#C4C9D4] p-3 rounded-lg overflow-x-auto leading-relaxed hidden">
                             <pre>
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                              CLIENT ACCESS LAYER                                │
@@ -1116,14 +1132,14 @@
           │ (TCP Port 6379)          │ (TCP Port 6379)               │ (HTTPS/WSS)
           ▼                          ▼                               ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                       GATEWAY & PROTOCOL PARSER LAYER                           │
+│                       GATEWAY &amp; PROTOCOL PARSER LAYER                           │
 │   • TCP Socket Manager (server.js)        • HTTP/WS Gateway Bridge (bridge.js)  │
-│   • Binary RESP2 State Machine (parser.js) • OAuth & JWT Security Authenticator │
+│   • Binary RESP2 State Machine (parser.js) • OAuth &amp; JWT Security Authenticator │
 └────────────────────────────────────┬────────────────────────────────────────────┘
                                      │
                                      ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                      SECURITY & COMMAND ROUTING GATEWAY                         │
+│                      SECURITY &amp; COMMAND ROUTING GATEWAY                         │
 │   • requirepass Auth Guard                 • Dangerous Command Interceptor       │
 │   • RBAC Role Evaluator (Admin/Dev/Read)   • Structured Password-Redacted Audit  │
 └────────────────────────────────────┬────────────────────────────────────────────┘
@@ -1142,6 +1158,15 @@
 │                              PERSISTENCE SUBSYSTEM                              │
 │   • Binary RDB Snapshot Engine (rdb.js)   • Write-Ahead AOF Logger (aof.js)     │
 └─────────────────────────────────────────────────────────────────────────────────┘</pre>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] text-[#7E8490]">
+                            <div class="flex items-center gap-3">
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-accent-blue"></span> Click nodes for deep code audit</span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-accent-green"></span> Live/Still trace motion</span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-accent-orange"></span> Guided views &amp; Route probes</span>
+                            </div>
+                            <span class="font-mono text-[10px]">Archify 3.0 Showcase</span>
                         </div>
                     </div>
 
